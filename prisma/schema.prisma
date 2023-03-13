@@ -1,0 +1,30 @@
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Dataset {
+  id         String @id @default(cuid())
+  name       String
+  type       String
+  connection String
+
+  workspace   Workspace? @relation(fields: [workspaceId], references: [id], onDelete: SetNull, onUpdate: NoAction)
+  workspaceId String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Workspace {
+  id       String    @id @default(cuid())
+  name     String
+  datasets Dataset[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
