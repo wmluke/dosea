@@ -3,14 +3,18 @@ module.exports = {
     content: [
         "node_modules/daisyui/dist/**/*.js",
         "node_modules/react-daisyui/dist/**/*.js",
-        "./app/**/*.{ts,tsx,jsx,js}"
+        "./app/**/*.{ts,tsx,jsx,js}",
     ],
     theme: {
-        extend: {}
+        extend: {},
     },
-    plugins: [require('@tailwindcss/typography'), require("daisyui")],
+    plugins: [
+        require("@tailwindcss/typography"),
+        require("@tailwindcss/forms"),
+        require("daisyui"),
+    ],
 
     daisyui: {
-        themes: ["night", "night", "aqua"]
-    }
+        themes: ["night", "night", "aqua"],
+    },
 };

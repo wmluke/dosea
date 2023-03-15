@@ -18,12 +18,36 @@ model Dataset {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  Query     Query[]
 }
 
 model Workspace {
   id       String    @id @default(cuid())
   name     String
   datasets Dataset[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Query {
+  id        String  @id @default(cuid())
+  name      String?
+  query     String
+  datasets  Dataset @relation(fields: [datasetId], references: [id])
+  datasetId String
+
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  ChartConfig ChartConfig[]
+}
+
+model ChartConfig {
+  id      String @id @default(cuid())
+  json    String
+  type    String
+  query   Query  @relation(fields: [queryId], references: [id])
+  queryId String
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

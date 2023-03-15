@@ -1,23 +1,23 @@
-import type {LoaderArgs} from '@remix-run/node';
-import {json} from '@remix-run/node';
-import {Link, NavLink, Outlet, useLoaderData} from '@remix-run/react';
-import {getWorkspaceById} from '~/models/workspace.server';
+import type { LoaderArgs } from "@remix-run/node";
+import { json } from "@remix-run/node";
+import { Link, NavLink, Outlet, useLoaderData } from "@remix-run/react";
+import { getWorkspaceById } from "~/models/workspace.server";
 
-export async function loader({params}: LoaderArgs) {
+export async function loader({ params }: LoaderArgs) {
     if (!params.workspaceId) {
-        throw new Response('Not Found', {
-            status: 404
+        throw new Response("Not Found", {
+            status: 404,
         });
     }
 
     const workspace = await getWorkspaceById(params.workspaceId);
     if (!workspace) {
-        throw new Response('Not Found', {
-            status: 404
+        throw new Response("Not Found", {
+            status: 404,
         });
     }
 
-    return json({workspace})
+    return json({ workspace });
 }
 
 function classNames(...classes: string[]) {
@@ -68,15 +68,21 @@ export default function WorkspacePage() {
                         </Link>
                     </li>
                     {workspace.datasets.map((ds) => {
-                        return <li key={ds.id}>
-                            <NavLink to={'/workspace/' + workspace.id + '/dataset/' + ds.id}
-                                     className={({isActive}) =>
-                                         classNames(isActive ? 'active' : '', 'gap')
-                                     }
-                            >
-                                {ds.name}
-                            </NavLink>
-                        </li>;
+                        return (
+                            <li key={ds.id}>
+                                <NavLink
+                                    to={`/workspace/${workspace.id}/dataset/${ds.id}/explore`}
+                                    className={({ isActive }) =>
+                                        classNames(
+                                            isActive ? "active" : "",
+                                            "gap"
+                                        )
+                                    }
+                                >
+                                    {ds.name}
+                                </NavLink>
+                            </li>
+                        );
                     })}
                 </ul>
             </div>
