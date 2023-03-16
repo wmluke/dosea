@@ -43,21 +43,18 @@ export class SqliteDatabase implements DB {
     public getTables(): Promise<Table[]> {
         const rawTables = this.db
             .prepare(
-                `SELECT name
-                                           FROM (SELECT * FROM sqlite_schema UNION ALL SELECT * FROM sqlite_temp_schema)
-                                           WHERE type = 'table'
-                                           ORDER BY name;`
+                `
+                SELECT name
+                FROM (SELECT * FROM sqlite_schema UNION ALL SELECT * FROM sqlite_temp_schema)
+                WHERE type = 'table'
+                ORDER BY name;
+                `.trim()
             )
             .all();
 
         return Promise.resolve(
             rawTables.map(({ name: tName }) => {
-                const columns = this.db
-                    .prepare(
-                        `SELECT *
-                                             FROM PRAGMA_TABLE_INFO(?)`
-                    )
-                    .all(tName);
+                const columns = this.db.prepare("SELECT * FROM PRAGMA_TABLE_INFO(?)").all(tName);
                 return {
                     name: tName as string,
                     columns: columns.map(({ name, type }) => {

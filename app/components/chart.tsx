@@ -1,6 +1,5 @@
-import ReactEChartsCore from "echarts-for-react/lib/core";
+import ReactECharts from "echarts-for-react";
 import type { BarSeriesOption, LineSeriesOption, PieSeriesOption } from "echarts/charts";
-import { BarChart, LineChart, PieChart } from "echarts/charts";
 import type {
     DatasetComponentOption,
     GridComponentOption,
@@ -8,25 +7,10 @@ import type {
     TitleComponentOption,
     TooltipComponentOption
 } from "echarts/components";
-import { DatasetComponent, GridComponent, LegendComponent, TitleComponent, TooltipComponent } from "echarts/components";
-import * as echarts from "echarts/core";
-import { SVGRenderer } from "echarts/renderers";
-
-// Register the required components
-echarts.use([
-    TitleComponent,
-    TooltipComponent,
-    LegendComponent,
-    GridComponent,
-    DatasetComponent,
-    BarChart,
-    LineChart,
-    PieChart,
-    SVGRenderer,
-]);
+import type * as echarts from "echarts/core";
 
 // Create an Option type with only the required components and charts via ComposeOption
-type ECOption = echarts.ComposeOption<
+export type ECOption = echarts.ComposeOption<
     | BarSeriesOption
     | LineSeriesOption
     | TitleComponentOption
@@ -37,75 +21,26 @@ type ECOption = echarts.ComposeOption<
     | PieSeriesOption
 >;
 
-export interface ChartProps<
-    T = Record<string, string | number | boolean | Date>[]
-> {
-    data: T;
+export interface ChartProps<T = Record<string, string | number | boolean | Date>[]> {
+    data?: T;
+
+    config?: ECOption;
 }
 
-export function Chart({ data }: ChartProps) {
+export function Chart({ data, config }: ChartProps) {
     const chartOptions: ECOption = {
-        title: {
-            text: "Specials, Venues, and Neighborhoods",
-            textStyle: {
-                align: "center",
-            },
-            subtext: "Grouped by Day of Week",
-            subtextStyle: {
-                align: "center",
-            },
-            textAlign: "center",
-            left: "50%",
-        },
-        tooltip: {
-            trigger: "axis",
-            axisPointer: { type: "cross" },
-        },
-        legend: {
-            // Try 'horizontal'
-            orient: "vertical",
-            right: 10,
-            // top: "center",
-        },
         dataset: {
-            dimensions: ["dayofweek", "specials", "venues", "neighborhoods"],
             source: data,
         },
-        xAxis: {
-            type: "category",
-            name: "Day of Week",
-            nameLocation: "middle",
-            nameGap: 30,
-        },
-        yAxis: {
-            type: "value",
-            name: "Count",
-            nameLocation: "middle",
-            nameGap: 40,
-        },
-        series: [
-            {
-                name: "Specials",
-                type: "bar",
-            },
-            {
-                name: "Venues",
-                type: "line",
-            },
-            {
-                name: "Neighborhoods",
-                type: "bar",
-            },
-        ],
+        ...(config ?? {}),
     };
 
     return (
-        <ReactEChartsCore
-            echarts={echarts}
+        <ReactECharts
             option={chartOptions}
             notMerge={true}
             lazyUpdate={true}
-            className="w-full"
+            className="min-h-[200px] w-full min-w-[300px]"
         />
     );
 }

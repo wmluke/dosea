@@ -1,0 +1,55 @@
+import type { ChangeEvent } from "react";
+import { useState } from "react";
+import type { ECOption } from "~/components/chart";
+import { Chart } from "~/components/chart";
+import { useLocalStorage } from "~/utils";
+
+export interface ChartEditorProps {
+    data?: any;
+    config?: ECOption;
+    queryId: string;
+    chartId?: string;
+}
+
+export function ChartEditor({ data, config, queryId, chartId }: ChartEditorProps) {
+    const [chartConfig, setChartConfig] = useLocalStorage(
+        ["chartconfig", queryId, chartId ?? "new"].join("."),
+        config ?? {}
+    );
+
+    const [isValidJson, setValidJson] = useState(true);
+
+    function onChange(e: ChangeEvent<HTMLTextAreaElement>) {
+        const { value } = e.target;
+        try {
+            setChartConfig(JSON.parse(value));
+            setValidJson(true);
+        } catch (e) {
+            console.warn(e);
+            setValidJson(false);
+        }
+    }
+
+    return (
+        <>
+            <Chart data={data} config={chartConfig}></Chart>
+            <form method="post">
+                <div className="form-control">
+                    <label className="label">
+                        <span className="label-text">Chart Config</span>
+                        <span className="label-text-alt">JSON</span>
+                    </label>
+                    <textarea
+                        name="configJson"
+                        className={`textarea-bordered textarea h-[600px] ${!isValidJson ? "textarea-error" : ""}`}
+                        defaultValue={JSON.stringify(chartConfig, null, 4)}
+                        onChange={onChange}
+                    ></textarea>
+                    <button type="submit" className="btn-primary btn">
+                        Save
+                    </button>
+                </div>
+            </form>
+        </>
+    );
+}

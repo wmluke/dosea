@@ -1,28 +1,29 @@
 import type { LoaderArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
-import { Outlet, useLoaderData } from "@remix-run/react";
+import { Link, Outlet, useLoaderData } from "@remix-run/react";
 import type { ActionArgs } from "@remix-run/server-runtime";
+import { DatasetSchema } from "~/components/datasetSchema";
 import { connect } from "~/lib/connector/sqlite";
 import { getDatasetById } from "~/models/dataset.server";
+import { badRequest, notFound } from "~/utils";
 
-export async function loader({ params }: LoaderArgs) {
-    const { workspaceId, datasetId } = params;
+export async function loadDataset(datasetId?: string, workspaceId?: string) {
     if (!datasetId) {
-        throw new Response("Not Found", {
-            status: 404,
-        });
+        throw notFound();
     }
     const dataset = await getDatasetById(datasetId as string);
     if (!dataset) {
-        throw new Response("Not Found", {
-            status: 404,
-        });
+        throw notFound();
     }
     if (dataset.workspaceId != workspaceId) {
-        throw new Response("Not Found", {
-            status: 404,
-        });
+        throw badRequest();
     }
+    return dataset;
+}
+
+export async function loader({ params }: LoaderArgs) {
+    const { workspaceId, datasetId } = params;
+    const dataset = await loadDataset(datasetId, workspaceId);
 
     const db = await connect(dataset.connection, dataset.type);
     try {
@@ -35,33 +36,25 @@ export async function loader({ params }: LoaderArgs) {
 
 export async function action({ params, request }: ActionArgs) {
     const { workspaceId, datasetId } = params;
-    if (!datasetId) {
-        throw new Response("Not Found", {
-            status: 404,
-        });
-    }
-    const dataset = await getDatasetById(datasetId as string);
-    if (!dataset) {
-        throw new Response("Not Found", {
-            status: 404,
-        });
-    }
-    if (dataset.workspaceId != workspaceId) {
-        throw new Response("Not Found", {
-            status: 404,
-        });
-    }
-
-    const db = await connect(dataset.connection, dataset.type);
+    const dataset = await loadDataset(datasetId, workspaceId);
 
     const form = await request.formData();
+
     const query = form.get("query");
     if (!query) {
-        throw "Invalid argument.  Missing query.";
+        throw "Invalid argument. Missing query.";
     }
+    const db = await connect(dataset.connection, dataset.type);
+    try {
+        const queryResults = await db.query(query as string);
+        return json({ queryResults, query });
+    } finally {
+        await db.close();
+    }
+}
 
-    const queryResults = await db.query(query as string);
-    return json({ queryResults, query });
+function truncate(str: string, n: number) {
+    return str.length > n ? str.slice(0, n - 1) + " ..." : str;
 }
 
 export default function DatasetPage() {
@@ -81,25 +74,25 @@ export default function DatasetPage() {
                     <Outlet />
                 </div>
                 <div className="prose basis-1/4">
-                    <h2>Tables</h2>
-                    <ul>
-                        {tables.map((t) => {
+                    <h2>Queries</h2>
+                    <ul className="prose">
+                        {dataset.queries.map((q) => {
                             return (
-                                <li key={t.name}>
-                                    {t.name}
-                                    <ul>
-                                        {t.columns.map((c) => {
-                                            return (
-                                                <li key={`${t.name}.${c.name}`}>
-                                                    {c.name}: {c.type}
-                                                </li>
-                                            );
-                                        })}
-                                    </ul>
+                                <li key={q.id}>
+                                    <Link to={`explore/${q.id}`} reloadDocument={true} className="no-underline">
+                                        <code className="p-0">{truncate(q.query, 40)}</code>
+                                    </Link>
                                 </li>
                             );
                         })}
+                        <li>
+                            <Link to="explore" reloadDocument={true} className="no-underline">
+                                Add Query
+                            </Link>
+                        </li>
                     </ul>
+                    <h2>Tables</h2>
+                    <DatasetSchema tables={tables} />
                 </div>
             </section>
         </div>

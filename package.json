@@ -23,7 +23,8 @@
     "validate": "run-p \"test -- --run\" lint typecheck test:e2e:run"
   },
   "prettier": {
-    "tabWidth": 4
+    "tabWidth": 4,
+    "printWidth": 120
   },
   "eslintIgnore": [
     "/node_modules",

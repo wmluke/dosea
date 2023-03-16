@@ -5,21 +5,18 @@ import { useRouteLoaderData } from "react-router";
 import type { ConnectionType } from "~/models/dataset.server";
 import { createDataset } from "~/models/dataset.server";
 import { getWorkspaceById } from "~/models/workspace.server";
+import { badRequest, notFound } from "~/utils";
 
 type WorkspaceLoader = { workspace: Workspace };
 
 export async function action({ request, params }: ActionArgs) {
     const workspaceId = params.workspaceId;
     if (!workspaceId) {
-        throw new Response("Not Found", {
-            status: 404,
-        });
+        throw notFound();
     }
     const workspace = await getWorkspaceById(workspaceId);
     if (!workspace) {
-        throw new Response("Not Found", {
-            status: 404,
-        });
+        throw notFound();
     }
     const form = await request.formData();
     const [name, type, connection] = [
@@ -29,21 +26,15 @@ export async function action({ request, params }: ActionArgs) {
     ];
 
     if (!name) {
-        throw new Response("Invalid Request", {
-            status: 400,
-        });
+        throw badRequest();
     }
 
     if (!type) {
-        throw new Response("Invalid Request", {
-            status: 400,
-        });
+        throw badRequest();
     }
 
     if (!connection) {
-        throw new Response("Invalid Request", {
-            status: 400,
-        });
+        throw badRequest();
     }
 
     await createDataset({ name, type, connection, workspaceId });
@@ -52,9 +43,7 @@ export async function action({ request, params }: ActionArgs) {
 }
 
 export default function DatasetAddPage() {
-    const { workspace } = useRouteLoaderData(
-        "routes/workspace.$workspaceId"
-    ) as WorkspaceLoader;
+    const { workspace } = useRouteLoaderData("routes/workspace.$workspaceId") as WorkspaceLoader;
 
     return (
         <div className="prose">
@@ -66,21 +55,13 @@ export default function DatasetAddPage() {
                     <label className="label">
                         <span className="label-text">Name</span>
                     </label>
-                    <input
-                        type="text"
-                        name="name"
-                        placeholder="Name"
-                        className="input-bordered input"
-                    />
+                    <input type="text" name="name" placeholder="Name" className="input-bordered input" />
                 </div>
                 <div className="form-control">
                     <label className="label">
                         <span className="label-text">Type</span>
                     </label>
-                    <select
-                        name="type"
-                        className="select-bordered select w-full max-w-xs"
-                    >
+                    <select name="type" className="select-bordered select w-full max-w-xs">
                         <option value="sqlite">Sqlite</option>
                         <option value="csv">CSV</option>
                     </select>
@@ -89,12 +70,7 @@ export default function DatasetAddPage() {
                     <label className="label">
                         <span className="label-text">Connection</span>
                     </label>
-                    <input
-                        type="text"
-                        name="connection"
-                        placeholder="connection"
-                        className="input-bordered input"
-                    />
+                    <input type="text" name="connection" placeholder="connection" className="input-bordered input" />
                 </div>
 
                 <div className="form-control">

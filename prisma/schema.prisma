@@ -1,54 +1,57 @@
 datasource db {
-  provider = "sqlite"
-  url      = env("DATABASE_URL")
+    provider = "sqlite"
+    url      = env("DATABASE_URL")
 }
 
 generator client {
-  provider = "prisma-client-js"
+    provider = "prisma-client-js"
 }
 
 model Dataset {
-  id         String @id @default(cuid())
-  name       String
-  type       String
-  connection String
+    id         String @id @default(cuid())
+    name       String
+    type       String
+    connection String
 
-  workspace   Workspace? @relation(fields: [workspaceId], references: [id], onDelete: SetNull, onUpdate: NoAction)
-  workspaceId String?
+    workspace   Workspace? @relation(fields: [workspaceId], references: [id], onDelete: SetNull, onUpdate: NoAction)
+    workspaceId String?
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  Query     Query[]
+    queries DatasetQuery[]
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
 }
 
 model Workspace {
-  id       String    @id @default(cuid())
-  name     String
-  datasets Dataset[]
+    id       String    @id @default(cuid())
+    name     String
+    datasets Dataset[]
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
 }
 
-model Query {
-  id        String  @id @default(cuid())
-  name      String?
-  query     String
-  datasets  Dataset @relation(fields: [datasetId], references: [id])
-  datasetId String
+model DatasetQuery {
+    id        String  @id @default(cuid())
+    name      String?
+    query     String
+    dataset   Dataset @relation(fields: [datasetId], references: [id])
+    datasetId String
 
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
-  ChartConfig ChartConfig[]
+    createdAt   DateTime      @default(now())
+    updatedAt   DateTime      @updatedAt
+    ChartConfig ChartConfig[]
+
+    @@map("Query")
 }
 
 model ChartConfig {
-  id      String @id @default(cuid())
-  json    String
-  type    String
-  query   Query  @relation(fields: [queryId], references: [id])
-  queryId String
+    id         String       @id @default(cuid())
+    configJson String
+    type       String
+    query      DatasetQuery @relation(fields: [queryId], references: [id])
+    queryId    String
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
 }

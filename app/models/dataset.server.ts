@@ -10,21 +10,21 @@ export interface DatasetInput {
 }
 
 export function getDatasetById(id: string) {
-    return prisma.dataset.findUnique({ where: { id } });
+    return prisma.dataset.findUnique({
+        where: { id },
+        include: {
+            queries: true,
+        },
+    });
 }
 
-export function createDataset({
-    name,
-    type,
-    connection,
-    workspaceId,
-}: DatasetInput) {
+export function createDataset({ name, type, connection, workspaceId }: DatasetInput) {
     return prisma.dataset.create({
         data: {
             name,
             type,
             connection,
-            workspaceId,
+            workspaced,
         },
     });
 }

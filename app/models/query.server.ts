@@ -8,19 +8,23 @@ export interface CreateQueryInput {
 }
 
 export function saveQuery({ id, name, query, datasetId }: CreateQueryInput) {
-    return prisma.query.upsert({
-        create: { name, query, datasetId },
-        update: { id, name, query },
-        where: { id },
+    if (id) {
+        return prisma.datasetQuery.update({
+            where: { id },
+            data: { name: name ?? null, query },
+        });
+    }
+    return prisma.datasetQuery.create({
+        data: { name: name ?? null, query, datasetId },
     });
 }
 
 export function getQueryById(id: string) {
-    return prisma.query.findUnique({ where: { id } });
+    return prisma.datasetQuery.findUnique({ where: { id } });
 }
 
 export function getQueriesByDatasetId(datasetId: string) {
-    return prisma.query.findMany({
+    return prisma.datasetQuery.findMany({
         where: {
             datasetId,
         },
