@@ -2,6 +2,8 @@ import type { ChartConfig, Dataset, DatasetQuery } from "@prisma/client";
 import type { LoaderArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { Link, Outlet, useLoaderData } from "@remix-run/react";
+// import GridLayout from "react-grid-layout";
+import { Responsive, WidthProvider } from "react-grid-layout";
 import { Chart } from "~/components/chart";
 import { QueryResultsInspector } from "~/components/queryResultsInspector";
 import { connect } from "~/lib/connector/sqlite";
@@ -76,44 +78,63 @@ export async function loader({ params }: LoaderArgs) {
     }
 }
 
+const ResponsiveGridLayout = WidthProvider(Responsive);
+
+function gridItemLayout(i: number) {
+    return {
+        x: 0,
+        y: i,
+        h: 1,
+        w: 2,
+        i: i + "",
+    };
+}
+
 export default function QueryPage() {
     const data = useLoaderData<typeof loader>();
     return (
         <>
             <h3 className="prose">Query Results</h3>
             <div className="flex w-full justify-between">
-                <QueryResultsInspector result={data.result} error={data.error} className="w-[100px]" />
-                <div className="grow overflow-hidden">
+                <QueryResultsInspector result={data.result} error={data.error} className="w-[200px] overflow-hidden" />
+                <div className="min-w-[600px] shrink grow overflow-hidden">
                     <Outlet />
-                    {data.charts?.map((chart) => {
-                        return (
-                            <div key={chart.id} className="card card-compact w-full bg-base-100 shadow-xl">
-                                <figure>
-                                    <Chart
-                                        key={chart.id}
-                                        data={data.result ?? []}
-                                        config={JSON.parse(chart.configJson)}
-                                    />
-                                </figure>
-                                <div className="card-body">
-                                    <div className="card-actions justify-end">
-                                        <Link
-                                            to={joinTruthy(["chart", chart.id], "/")}
-                                            className="btn-secondary btn-xs btn"
-                                        >
-                                            Edit
-                                        </Link>
-                                        <Link
-                                            to={joinTruthy(["chart", chart.id, "delete"], "/")}
-                                            className="btn-info btn-xs btn"
-                                        >
-                                            Delete
-                                        </Link>
+
+                    <ResponsiveGridLayout
+                        //width={600}
+                        rowHeight={500}
+                        breakpoints={{ lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 }}
+                        cols={{ lg: 3, md: 2, sm: 2, xs: 2, xxs: 2 }}
+                    >
+                        {data.charts?.map((chart, i) => {
+                            return (
+                                <div
+                                    key={chart.id}
+                                    className="card card-compact w-full bg-base-100 shadow-xl"
+                                    data-grid={gridItemLayout(i)}
+                                >
+                                    <Chart data={data.result ?? []} config={JSON.parse(chart.configJson)} />
+
+                                    <div className="card-body">
+                                        <div className="card-actions justify-end">
+                                            <Link
+                                                to={joinTruthy(["chart", chart.id], "/")}
+                                                className="btn-secondary btn-xs btn"
+                                            >
+                                                Edit
+                                            </Link>
+                                            <Link
+                                                to={joinTruthy(["chart", chart.id, "delete"], "/")}
+                                                className="btn-info btn-xs btn"
+                                            >
+                                                Delete
+                                            </Link>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                        );
-                    })}
+                            );
+                        })}
+                    </ResponsiveGridLayout>
                 </div>
             </div>
         </>

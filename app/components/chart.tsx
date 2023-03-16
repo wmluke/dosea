@@ -1,4 +1,7 @@
-import ReactECharts from "echarts-for-react";
+import * as echarts from "echarts";
+import ReactEChartsCore from "echarts-for-react/lib/core";
+
+// Create an Option type with only the required components and charts via ComposeOption
 import type { BarSeriesOption, LineSeriesOption, PieSeriesOption } from "echarts/charts";
 import type {
     DatasetComponentOption,
@@ -7,9 +10,7 @@ import type {
     TitleComponentOption,
     TooltipComponentOption
 } from "echarts/components";
-import type * as echarts from "echarts/core";
 
-// Create an Option type with only the required components and charts via ComposeOption
 export type ECOption = echarts.ComposeOption<
     | BarSeriesOption
     | LineSeriesOption
@@ -34,13 +35,14 @@ export function Chart({ data, config }: ChartProps) {
         },
         ...(config ?? {}),
     };
-
     return (
-        <ReactECharts
+        <ReactEChartsCore
+            echarts={echarts}
             option={chartOptions}
             notMerge={true}
             lazyUpdate={true}
-            className="min-h-[200px] w-full min-w-[300px]"
+            style={{ height: "100% !important" }}
+            className="h-full w-full overflow-hidden"
         />
     );
 }
