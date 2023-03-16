@@ -1,4 +1,5 @@
-import { LoaderArgs, redirect } from "@remix-run/node";
+import type { LoaderArgs } from "@remix-run/node";
+import { redirect } from "@remix-run/node";
 import { deleteChartConfig, getChartConfigById } from "~/models/chartconfig.server";
 import { joinTruthy, notFound } from "~/utils";
 
