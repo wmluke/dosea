@@ -11,10 +11,52 @@ export interface ChartEditorProps {
     chartId?: string;
 }
 
+const defaultConfig = {
+    title: {
+        text: "Title",
+        textStyle: {
+            align: "center",
+        },
+        subtext: "Subtitle",
+        subtextStyle: {
+            align: "center",
+        },
+        textAlign: "center",
+        left: "50%",
+    },
+    tooltip: {
+        trigger: "axis",
+        axisPointer: {
+            type: "cross",
+        },
+    },
+    legend: {
+        orient: "vertical",
+        right: 5,
+    },
+    xAxis: {
+        type: "category",
+        name: "x-axis name",
+        nameLocation: "middle",
+        nameGap: 30,
+    },
+    yAxis: {
+        type: "value",
+        name: "y-axis name",
+        nameLocation: "middle",
+        nameGap: 40,
+    },
+    series: [
+        {
+            type: "bar",
+        },
+    ],
+};
+
 export function ChartEditor({ data, config, queryId, chartId }: ChartEditorProps) {
     const [chartConfig, setChartConfig] = useLocalStorage(
         ["chartconfig", queryId, chartId ?? "new"].join("."),
-        config ?? {}
+        config ?? { ...defaultConfig }
     );
 
     const [isValidJson, setValidJson] = useState(true);

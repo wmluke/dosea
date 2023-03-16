@@ -11,7 +11,7 @@ import type { QueryResults } from "~/routes/workspace.$workspaceId.dataset.$data
 import { loadQuery } from "~/routes/workspace.$workspaceId.dataset.$datasetId.explore.$queryId";
 import { badRequest, notFound } from "~/utils";
 
-export async function loader({ params, request }: LoaderArgs) {
+export async function loader({ params }: LoaderArgs) {
     const { queryId, chartId } = params;
     if (!chartId) {
         throw notFound();

@@ -77,12 +77,16 @@ export function useLocalStorage<T>(key: string, initialValue: T) {
 
 export function notFound(message?: string) {
     return new Response(["Not Found", message].filter(Boolean).join(": "), {
-        status: 404
+        status: 404,
     });
 }
 
 export function badRequest(message?: string) {
     return new Response(["Bad Request", message].filter(Boolean).join(": "), {
-        status: 400
+        status: 400,
     });
+}
+
+export function joinTruthy(strs: Array<string | number | undefined | null>, separator: string): string {
+    return strs.filter(Boolean).join(separator);
 }

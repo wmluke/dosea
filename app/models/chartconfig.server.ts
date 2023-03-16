@@ -30,3 +30,7 @@ export function saveChartConfig({ id, configJson, queryId, type }: ChartConfigIn
         data: { configJson, queryId, type },
     });
 }
+
+export function deleteChartConfig(id: string) {
+    return prisma.chartConfig.delete({ where: { id } });
+}

@@ -8,7 +8,7 @@ import { connect } from "~/lib/connector/sqlite";
 import { getChartConfigsByQueryId } from "~/models/chartconfig.server";
 import { getQueryById } from "~/models/query.server";
 import { loadDataset } from "~/routes/workspace.$workspaceId.dataset.$datasetId";
-import { badRequest, notFound } from "~/utils";
+import { badRequest, joinTruthy, notFound } from "~/utils";
 
 export interface QueryError {
     code?: string;
@@ -82,8 +82,8 @@ export default function QueryPage() {
         <>
             <h3 className="prose">Query Results</h3>
             <div className="flex w-full justify-between">
-                <QueryResultsInspector result={data.result} error={data.error} />
-                <div className="grow">
+                <QueryResultsInspector result={data.result} error={data.error} className="w-[100px]" />
+                <div className="grow overflow-hidden">
                     <Outlet />
                     {data.charts?.map((chart) => {
                         return (
@@ -97,8 +97,17 @@ export default function QueryPage() {
                                 </figure>
                                 <div className="card-body">
                                     <div className="card-actions justify-end">
-                                        <Link to={["chart", chart.id].join("/")} className="btn-secondary btn-xs btn">
+                                        <Link
+                                            to={joinTruthy(["chart", chart.id], "/")}
+                                            className="btn-secondary btn-xs btn"
+                                        >
                                             Edit
+                                        </Link>
+                                        <Link
+                                            to={joinTruthy(["chart", chart.id, "delete"], "/")}
+                                            className="btn-info btn-xs btn"
+                                        >
+                                            Delete
                                         </Link>
                                     </div>
                                 </div>
