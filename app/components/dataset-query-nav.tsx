@@ -1,8 +1,8 @@
 import { MagnifyingGlassIcon } from "@heroicons/react/20/solid";
 import { PlusCircleIcon } from "@heroicons/react/24/solid";
-import { Link, NavLink } from "@remix-run/react";
+import { NavLink } from "@remix-run/react";
 import type { DatasetWithQueries } from "~/models/dataset.server";
-import { truncate } from "~/utils";
+import { classNames, truncate } from "~/utils";
 
 export interface DatasetQueryNavProps {
     dataset?: DatasetWithQueries;
@@ -29,14 +29,15 @@ export function DatasetQueryNav({ dataset }: DatasetQueryNavProps) {
                 );
             })}
             <li>
-                <Link
+                <NavLink
                     to={`/workspace/${dataset?.workspaceId}/dataset/${dataset?.id}/explore`}
                     reloadDocument={true}
-                    className="no-underline"
+                    className={classNames("no-underline", dataset?.id ? null : "hidden")}
+                    end
                 >
                     <PlusCircleIcon className="h-6 w-6" />
                     New Query
-                </Link>
+                </NavLink>
             </li>
         </>
     );
