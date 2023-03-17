@@ -1,15 +1,16 @@
-import { CircleStackIcon, PlusCircleIcon } from "@heroicons/react/24/solid";
 import type { LoaderArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
-import { Link, NavLink, Outlet, useLoaderData } from "@remix-run/react";
-import { DatasetQueryNav } from "~/components/dataset-query-nav";
-import { DatasetSchema } from "~/components/dataset-schema";
+import { Outlet, useLoaderData } from "@remix-run/react";
+import { useRouteLoaderData } from "react-router";
+import { LeftNav } from "~/components/left-nav";
+import { RightPane } from "~/components/right-pane";
 import type { Table } from "~/lib/connector/sqlite";
 import type { DatasetWithQueries } from "~/models/dataset.server";
 import { getDatasetById } from "~/models/dataset.server";
 import type { WorkspaceWithDatasets } from "~/models/workspace.server";
 import { getWorkspaceById } from "~/models/workspace.server";
 import { loadDatasetTable } from "~/routes/workspace.$workspaceId.dataset.$datasetId";
+import type { QueryResults } from "~/routes/workspace.$workspaceId.dataset.$datasetId.explore.$queryId";
 import { notFound } from "~/utils";
 
 interface LoaderResponse {
@@ -36,12 +37,12 @@ export async function loader({ params }: LoaderArgs) {
     return json(resp);
 }
 
-function classNames(...classes: string[]) {
-    return classes.filter(Boolean).join(" ");
-}
-
 export default function WorkspacePage() {
-    const { workspace, dataset, tables } = useLoaderData<typeof loader>();
+    const { workspace, dataset, tables } = useLoaderData<typeof loader>() as LoaderResponse;
+
+    const queryLoaderData = useRouteLoaderData(
+        "routes/workspace.$workspaceId.dataset.$datasetId.explore.$queryId"
+    ) as QueryResults;
 
     return (
         <div className="drawer-mobile drawer">
@@ -71,40 +72,22 @@ export default function WorkspacePage() {
                     <div className="mx-2 flex-1 px-2 text-3xl lg:hidden">{workspace?.name}</div>
                     <div className="flex-none"></div>
                 </div>
-                <div className="mx-2 my-2 bg-base-100 bg-opacity-90 px-2">
-                    <Outlet></Outlet>
+                <div className="mx-2 my-2 flex justify-between gap-10 bg-base-100 bg-opacity-90 px-2">
+                    <div className="grow basis-4/5">
+                        <Outlet></Outlet>
+                    </div>
+                    <div className="prose grow-0 basis-1/5">
+                        <RightPane
+                            queryResult={queryLoaderData?.result}
+                            queryError={queryLoaderData?.error}
+                            tables={tables}
+                        />
+                    </div>
                 </div>
             </div>
             <div className="drawer-side" style={{ scrollBehavior: "smooth", scrollPaddingTop: "5rem" }}>
                 <label htmlFor="my-drawer-2" className="drawer-overlay"></label>
-                <ul className="menu menu menu-compact flex w-80 flex-col bg-base-200 p-0 px-4 text-base-content">
-                    <li>
-                        <div className="mx-2 flex-1 px-2 text-3xl">{workspace?.name}</div>
-                    </li>
-                    <li className="menu-title flex flex-row flex-nowrap">
-                        <span className="text-xl">Datasets</span>
-                        <Link className="btn-xs btn-circle btn" to={`/workspace/${workspace?.id}/dataset/add`}>
-                            <PlusCircleIcon className="h-6 w-6"></PlusCircleIcon>
-                        </Link>
-                    </li>
-                    {workspace?.datasets.map((ds) => {
-                        return (
-                            <li key={ds.id}>
-                                <NavLink
-                                    reloadDocument
-                                    to={`/workspace/${workspace.id}/dataset/${ds.id}/explore`}
-                                    className={({ isActive }) => classNames(isActive ? "active" : "", "gap")}
-                                >
-                                    <CircleStackIcon className="h-6 w-6"></CircleStackIcon>
-                                    {ds.name}
-                                </NavLink>
-                            </li>
-                        );
-                    })}
-                    {/*@ts-ignore*/}
-                    <DatasetQueryNav dataset={dataset} />
-                    <DatasetSchema tables={tables} />
-                </ul>
+                <LeftNav workspace={workspace} dataset={dataset} />
             </div>
         </div>
     );

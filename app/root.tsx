@@ -13,25 +13,25 @@ export const links: LinksFunction = () => {
 
 export const meta: MetaFunction = () => ({
     charset: "utf-8",
-    title: "Databot",
+    title: "Dosea",
     viewport: "width=device-width,initial-scale=1",
 });
 
 function Document({ children, title }: { children: React.ReactNode; title?: string }) {
     return (
         <html lang="en">
-        <head>
-            <meta charSet="utf-8" />
-            {title ? <title>{title}</title> : null}
-            <Meta />
-            <Links />
-        </head>
-        <body className="relative flex min-h-screen w-full bg-gray-900 text-gray-200">
-        {children}
-        <ScrollRestoration />
-        <Scripts />
-        {process.env.NODE_ENV === "development" ? <LiveReload /> : null}
-        </body>
+            <head>
+                <meta charSet="utf-8" />
+                {title ? <title>{title}</title> : null}
+                <Meta />
+                <Links />
+            </head>
+            <body className="relative flex min-h-screen w-full bg-gray-900 text-gray-200">
+                {children}
+                <ScrollRestoration />
+                <Scripts />
+                {process.env.NODE_ENV === "development" ? <LiveReload /> : null}
+            </body>
         </html>
     );
 }
@@ -48,7 +48,7 @@ export function CatchBoundary() {
     const caught = useCatch();
 
     switch (caught.status) {
-        case 401:
+        case 400:
         case 404:
             return (
                 <Document title={`${caught.status} ${caught.statusText}`}>

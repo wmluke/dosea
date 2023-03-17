@@ -5,7 +5,7 @@ import type { DatasetWithQueries } from "~/models/dataset.server";
 import { truncate } from "~/utils";
 
 export interface DatasetQueryNavProps {
-    dataset: DatasetWithQueries;
+    dataset?: DatasetWithQueries;
 }
 
 export function DatasetQueryNav({ dataset }: DatasetQueryNavProps) {

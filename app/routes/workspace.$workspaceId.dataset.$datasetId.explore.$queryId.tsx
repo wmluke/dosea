@@ -1,13 +1,11 @@
-import type { ChartConfig, Dataset, DatasetQuery } from "@prisma/client";
 import type { LoaderArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { Link, Outlet, useLoaderData } from "@remix-run/react";
 import { Responsive, WidthProvider } from "react-grid-layout";
 import { Chart } from "~/components/chart";
 import { connect } from "~/lib/connector/sqlite";
-import { getChartConfigsByQueryId } from "~/models/chartconfig.server";
+import type { QueryWithDatasetAndCharts } from "~/models/query.server";
 import { getQueryById } from "~/models/query.server";
-import { loadDataset } from "~/routes/workspace.$workspaceId.dataset.$datasetId";
 import { badRequest, joinTruthy, notFound } from "~/utils";
 
 export interface QueryError {
@@ -17,10 +15,8 @@ export interface QueryError {
 }
 
 export interface QueryResults<T = Array<Record<string, any>>> {
-    dataset: Dataset;
-    query: DatasetQuery;
+    query: QueryWithDatasetAndCharts;
     result?: T;
-    charts?: ChartConfig[];
     error?: QueryError;
 }
 
@@ -38,9 +34,9 @@ export async function loadQuery({
 }: {
     queryId?: string;
     datasetId?: string;
-}): Promise<Partial<DatasetQuery> | null> {
+}): Promise<QueryWithDatasetAndCharts> {
     if (!queryId) {
-        return Promise.resolve({});
+        return Promise.resolve(null);
     }
     const query = await getQueryById(queryId);
     if (!query) {
@@ -53,24 +49,17 @@ export async function loadQuery({
 }
 
 export async function loader({ params }: LoaderArgs) {
-    const { workspaceId, datasetId, queryId } = params;
-    const dataset = await loadDataset(datasetId, workspaceId);
-    const query = await loadQuery({ queryId });
+    const { datasetId, queryId } = params;
+    const query = await loadQuery({ queryId, datasetId });
 
-    if (!query?.query) {
-        return json({ dataset, query } as QueryResults);
-    }
-
-    const charts = queryId ? await getChartConfigsByQueryId(queryId) : [];
-
-    const db = await connect(dataset.connection, dataset.type);
+    const db = await connect(query!.dataset.connection, query!.dataset.type);
     try {
-        const result = await db.query(query.query);
-        return json({ dataset, query, result, charts } as QueryResults);
+        const result = await db.query(query!.query);
+        return json({ query, result } as QueryResults);
     } catch (e: any) {
         console.warn("Dataset Explorer Query Error");
         console.warn(e);
-        return json({ dataset, query, error: err(e), charts } as QueryResults);
+        return json({ query, error: err(e) } as QueryResults);
     } finally {
         await db.close();
     }
@@ -98,7 +87,7 @@ export default function QueryPage() {
                 breakpoints={{ lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 }}
                 cols={{ lg: 3, md: 2, sm: 2, xs: 2, xxs: 2 }}
             >
-                {data.charts?.map((chart, i) => {
+                {data.query?.charts?.map((chart, i) => {
                     return (
                         <div
                             key={chart.id}

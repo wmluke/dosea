@@ -91,6 +91,10 @@ export function joinTruthy(strs: Array<string | number | undefined | null>, sepa
     return strs.filter(Boolean).join(separator);
 }
 
+export function classNames(...classes: Array<string | undefined | null>) {
+    return classes.filter(Boolean).join(" ");
+}
+
 export function truncate(str: string, n: number) {
     return str.length > n ? str.slice(0, n - 1) + " ..." : str;
 }

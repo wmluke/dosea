@@ -1,3 +1,4 @@
+import { Prisma } from "@prisma/client";
 import { prisma } from "~/db.server";
 
 export interface CreateQueryInput {
@@ -20,8 +21,16 @@ export function saveQuery({ id, name, query, datasetId }: CreateQueryInput) {
 }
 
 export function getQueryById(id: string) {
-    return prisma.datasetQuery.findUnique({ where: { id } });
+    return prisma.datasetQuery.findUnique({
+        where: { id },
+        include: {
+            dataset: true,
+            charts: true,
+        },
+    });
 }
+
+export type QueryWithDatasetAndCharts = Prisma.PromiseReturnType<typeof getQueryById>;
 
 export function getQueriesByDatasetId(datasetId: string) {
     return prisma.datasetQuery.findMany({

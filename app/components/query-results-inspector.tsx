@@ -1,11 +1,11 @@
-import { joinTruthy } from "~/utils";
+import { classNames } from "~/utils";
 
-export interface QueryResultsInspectorProps {
-    result?: Object;
+export interface QueryResultsInspectorProps<T = Array<Record<string, any>>> {
+    result?: T | null;
     error?: Object;
     className?: string;
 }
 
 export function QueryResultsInspector({ result, error, className }: QueryResultsInspectorProps) {
-    return <pre className={joinTruthy(["prose", className], " ")}>{JSON.stringify(result ?? error, null, 2)}</pre>;
+    return <pre className={classNames("prose", className)}>{JSON.stringify(result ?? error, null, 2)}</pre>;
 }

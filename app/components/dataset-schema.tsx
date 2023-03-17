@@ -2,14 +2,12 @@ import type { Table } from "~/lib/connector/sqlite";
 
 export interface DatasetSchemaProps {
     tables?: Table[];
+    className?: string;
 }
 
-export function DatasetSchema({ tables }: DatasetSchemaProps) {
+export function DatasetSchema({ tables, className }: DatasetSchemaProps) {
     return (
-        <>
-            <li className="menu-title">
-                <span className="text-xl">Tables</span>
-            </li>
+        <ul className={className}>
             {tables?.map((t) => {
                 return (
                     <li key={t.name} tabIndex={0}>
@@ -28,6 +26,6 @@ export function DatasetSchema({ tables }: DatasetSchemaProps) {
                     </li>
                 );
             })}
-        </>
+        </ul>
     );
 }

@@ -38,9 +38,9 @@ model DatasetQuery {
     dataset   Dataset @relation(fields: [datasetId], references: [id])
     datasetId String
 
-    createdAt   DateTime      @default(now())
-    updatedAt   DateTime      @updatedAt
-    ChartConfig ChartConfig[]
+    createdAt DateTime      @default(now())
+    updatedAt DateTime      @updatedAt
+    charts    ChartConfig[]
 
     @@map("Query")
 }

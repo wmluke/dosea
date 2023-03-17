@@ -1,4 +1,6 @@
-# Databot
+# Dosea
+
+> A dosea for your datasets
 
 ## Development
 
