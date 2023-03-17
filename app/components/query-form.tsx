@@ -5,6 +5,7 @@ import { joinTruthy } from "~/utils";
 export interface QueryFormProps {
     dataset: Dataset;
     query?: Partial<DatasetQuery> | null;
+    showAddChartButton?: boolean;
 }
 
 function AddChartButton({ queryId }: { queryId?: string }) {
@@ -18,7 +19,7 @@ function AddChartButton({ queryId }: { queryId?: string }) {
     );
 }
 
-export function QueryForm({ dataset, query }: QueryFormProps) {
+export function QueryForm({ dataset, query, showAddChartButton = true }: QueryFormProps) {
     const { id, workspaceId, type } = dataset;
     return (
         <form method="post" action={joinTruthy(["/workspace", workspaceId, "dataset", id, "explore"], "/")}>
@@ -53,7 +54,7 @@ export function QueryForm({ dataset, query }: QueryFormProps) {
                     </svg>
                     Run
                 </button>
-                <AddChartButton queryId={query?.id} />
+                {showAddChartButton ? <AddChartButton queryId={query?.id} /> : ""}
             </div>
         </form>
     );

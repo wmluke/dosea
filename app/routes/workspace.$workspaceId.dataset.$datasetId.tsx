@@ -2,7 +2,6 @@ import type { Dataset } from "@prisma/client";
 import type { LoaderArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { Outlet, useLoaderData } from "@remix-run/react";
-import type { ActionArgs } from "@remix-run/server-runtime";
 import { connect } from "~/lib/connector/sqlite";
 import { getDatasetById } from "~/models/dataset.server";
 import { badRequest, notFound } from "~/utils";
@@ -34,25 +33,6 @@ export async function loader({ params }: LoaderArgs) {
     const { workspaceId, datasetId } = params;
     const dataset = await loadDataset(datasetId, workspaceId);
     return json({ dataset });
-}
-
-export async function action({ params, request }: ActionArgs) {
-    const { workspaceId, datasetId } = params;
-    const dataset = await loadDataset(datasetId, workspaceId);
-
-    const form = await request.formData();
-
-    const query = form.get("query");
-    if (!query) {
-        throw "Invalid argument. Missing query.";
-    }
-    const db = await connect(dataset.connection, dataset.type);
-    try {
-        const queryResults = await db.query(query as string);
-        return json({ queryResults, query });
-    } finally {
-        await db.close();
-    }
 }
 
 export default function DatasetPage() {

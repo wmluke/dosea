@@ -2,17 +2,13 @@ import type { LoaderArgs } from "@remix-run/node";
 import { json, redirect } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 import type { ActionArgs } from "@remix-run/server-runtime";
-import { Suspense } from "react";
-import { useRouteLoaderData } from "react-router";
 import { ChartEditor } from "~/components/chart-editor";
-import { Loading } from "~/components/loading";
 import { getChartConfigById, saveChartConfig } from "~/models/chartconfig.server";
-import type { QueryResults } from "~/routes/workspace.$workspaceId.dataset.$datasetId.explore.$queryId";
-import { loadQuery } from "~/routes/workspace.$workspaceId.dataset.$datasetId.explore.$queryId";
+import { loadQuery, runQuery } from "~/routes/workspace.$workspaceId.dataset.$datasetId.explore.$queryId";
 import { badRequest, notFound } from "~/utils";
 
 export async function loader({ params }: LoaderArgs) {
-    const { queryId, chartId } = params;
+    const { datasetId, queryId, chartId } = params;
     if (!chartId) {
         throw notFound();
     }
@@ -27,7 +23,11 @@ export async function loader({ params }: LoaderArgs) {
     if (chartConfig.queryId !== queryId) {
         throw badRequest();
     }
-    return json({ chartConfig });
+
+    const query = await loadQuery({ queryId, datasetId });
+    const queryResult = await runQuery(query);
+
+    return json({ chartConfig, query, queryResult });
 }
 
 export async function action({ params, request }: ActionArgs) {
@@ -45,28 +45,23 @@ export async function action({ params, request }: ActionArgs) {
         id: chartId === "add" ? undefined : chartId,
         configJson,
         queryId: queryId as string,
-        type: "echart",
+        type: "echart"
     });
     return redirect(`/workspace/${workspaceId}/dataset/${datasetId}/explore/${queryId}`);
 }
 
-export default function () {
-    const { chartConfig } = useLoaderData<typeof loader>();
-
-    const { result, query } = useRouteLoaderData(
-        "routes/workspace.$workspaceId.dataset.$datasetId.explore.$queryId"
-    ) as QueryResults;
+export default function ChartEditorPage() {
+    const data = useLoaderData<typeof loader>();
 
     return (
-        <div className="mx-8 w-full">
-            <Suspense fallback={<Loading />}>
-                <ChartEditor
-                    data={result}
-                    queryId={query?.id!}
-                    chartId={chartConfig.id}
-                    config={JSON.parse(chartConfig.configJson)}
-                />
-            </Suspense>
+        <div className="w-full overflow-hidden">
+            <ChartEditor
+                className="mx-8 w-full"
+                data={data.queryResult?.result ?? []}
+                queryId={data.query?.id!}
+                chartId={data.chartConfig.id}
+                config={JSON.parse(data.chartConfig.configJson)}
+            />
         </div>
     );
 }

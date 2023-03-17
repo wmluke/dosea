@@ -9,11 +9,11 @@ import { loadDataset } from "~/routes/workspace.$workspaceId.dataset.$datasetId"
 import { loadQuery } from "~/routes/workspace.$workspaceId.dataset.$datasetId.explore.$queryId";
 
 export async function loader({ params }: LoaderArgs) {
-    const { workspaceId, datasetId, queryId } = params;
+    const { workspaceId, datasetId, queryId, chartId } = params;
     const dataset = await loadDataset(datasetId, workspaceId);
     const query = await loadQuery({ queryId, datasetId });
 
-    return json({ dataset, query });
+    return json({ dataset, query, chartId });
 }
 
 export async function action({ params, request }: ActionArgs) {
@@ -28,7 +28,7 @@ export async function action({ params, request }: ActionArgs) {
     const query = await saveQuery({
         id: queryId,
         query: q,
-        datasetId: datasetId!,
+        datasetId: datasetId!
     });
     return redirect(`/workspace/${workspaceId}/dataset/${datasetId}/explore/${query.id}`);
 }
@@ -38,7 +38,9 @@ export default function DatasetExplorePage() {
     return (
         <>
             <h2 className="prose">Explore</h2>
-            <QueryForm dataset={data.dataset as unknown as Dataset} query={data.query as unknown as DatasetQuery} />
+            <QueryForm dataset={data.dataset as unknown as Dataset}
+                       query={data.query as unknown as DatasetQuery}
+                       showAddChartButton={!data.chartId} />
 
             <Outlet />
         </>

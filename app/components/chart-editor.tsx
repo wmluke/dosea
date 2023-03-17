@@ -9,52 +9,53 @@ export interface ChartEditorProps {
     config?: ECOption;
     queryId: string;
     chartId?: string;
+    className?: string;
 }
 
-const defaultConfig = {
+const defaultConfig: ECOption = {
     title: {
         text: "Title",
         textStyle: {
-            align: "center",
+            align: "center"
         },
         subtext: "Subtitle",
         subtextStyle: {
-            align: "center",
+            align: "center"
         },
         textAlign: "center",
-        left: "50%",
+        left: "50%"
     },
     tooltip: {
         trigger: "axis",
         axisPointer: {
-            type: "cross",
-        },
+            type: "cross"
+        }
     },
     legend: {
         orient: "vertical",
-        right: 5,
+        right: 5
     },
     xAxis: {
         type: "category",
         name: "x-axis name",
         nameLocation: "middle",
-        nameGap: 30,
+        nameGap: 30
     },
     yAxis: {
         type: "value",
         name: "y-axis name",
         nameLocation: "middle",
-        nameGap: 40,
+        nameGap: 40
     },
     series: [
         {
-            type: "bar",
-        },
-    ],
+            type: "bar"
+        }
+    ]
 };
 
-export function ChartEditor({ data, config, queryId, chartId }: ChartEditorProps) {
-    const [chartConfig, setChartConfig] = useLocalStorage(
+export function ChartEditor({ data, config, queryId, chartId, className }: ChartEditorProps) {
+    const [chartConfig, setChartConfig] = useLocalStorage<ECOption>(
         ["chartconfig", queryId, chartId ?? "new"].join("."),
         config ?? { ...defaultConfig }
     );
@@ -73,9 +74,10 @@ export function ChartEditor({ data, config, queryId, chartId }: ChartEditorProps
     }
 
     return (
-        <>
-            {/* @ts-ignore */}
-            <Chart data={data} config={chartConfig}></Chart>
+        <div className={className}>
+            <figure className="h-[35vh]">
+                <Chart data={data} config={chartConfig}></Chart>
+            </figure>
             <form method="post">
                 <div className="form-control">
                     <label className="label">
@@ -88,11 +90,11 @@ export function ChartEditor({ data, config, queryId, chartId }: ChartEditorProps
                         defaultValue={JSON.stringify(chartConfig, null, 4)}
                         onChange={onChange}
                     ></textarea>
-                    <button type="submit" className="btn-primary btn">
+                    <button type="submit" className="btn-primary btn" disabled={!isValidJson}>
                         Save
                     </button>
                 </div>
             </form>
-        </>
+        </div>
     );
 }

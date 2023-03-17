@@ -22,7 +22,9 @@ export type ECOption = echarts.ComposeOption<
     | PieSeriesOption
 >;
 
-export interface ChartProps<T = Record<string, string | number | boolean | Date>[]> {
+export type ChartData = Record<string, string | number | boolean | Date>[];
+
+export interface ChartProps<T = ChartData> {
     data?: T;
 
     config?: ECOption;
@@ -31,7 +33,7 @@ export interface ChartProps<T = Record<string, string | number | boolean | Date>
 export function Chart({ data, config }: ChartProps) {
     const chartOptions: ECOption = {
         dataset: {
-            source: data,
+            source: data
         },
         ...(config ?? {}),
     };
