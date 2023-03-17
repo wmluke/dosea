@@ -15,7 +15,7 @@ export function RightPane({ queryResult, queryError, tables }: RightPaneProps) {
             <div className="block h-[75vh] overflow-hidden">
                 <h3 className="prose">Query Results</h3>
                 <QueryResultsInspector
-                    className="h-full w-[300px] overflow-hidden overflow-y-auto text-sm"
+                    className="h-full w-[300px] overflow-hidden overflow-y-auto overflow-x-auto text-sm"
                     result={queryResult}
                     error={queryError}
                 />
