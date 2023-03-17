@@ -90,3 +90,7 @@ export function badRequest(message?: string) {
 export function joinTruthy(strs: Array<string | number | undefined | null>, separator: string): string {
     return strs.filter(Boolean).join(separator);
 }
+
+export function truncate(str: string, n: number) {
+    return str.length > n ? str.slice(0, n - 1) + " ..." : str;
+}

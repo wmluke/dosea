@@ -1,8 +1,10 @@
+import type { Dataset } from "@prisma/client";
 import type { LoaderArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
-import { Link, Outlet, useLoaderData } from "@remix-run/react";
+import { Outlet, useLoaderData } from "@remix-run/react";
 import type { ActionArgs } from "@remix-run/server-runtime";
-import { DatasetSchema } from "~/components/datasetSchema";
+import { useRouteLoaderData } from "react-router";
+import { QueryResultsInspector } from "~/components/query-results-inspector";
 import { connect } from "~/lib/connector/sqlite";
 import { getDatasetById } from "~/models/dataset.server";
 import { badRequest, notFound } from "~/utils";
@@ -15,23 +17,25 @@ export async function loadDataset(datasetId?: string, workspaceId?: string) {
     if (!dataset) {
         throw notFound();
     }
-    if (dataset.workspaceId != workspaceId) {
+    if (workspaceId && dataset.workspaceId != workspaceId) {
         throw badRequest();
     }
     return dataset;
 }
 
-export async function loader({ params }: LoaderArgs) {
-    const { workspaceId, datasetId } = params;
-    const dataset = await loadDataset(datasetId, workspaceId);
-
+export async function loadDatasetTable(dataset: Dataset) {
     const db = await connect(dataset.connection, dataset.type);
     try {
-        const tables = await db.getTables();
-        return json({ dataset, tables });
+        return db.getTables();
     } finally {
         await db.close();
     }
+}
+
+export async function loader({ params }: LoaderArgs) {
+    const { workspaceId, datasetId } = params;
+    const dataset = await loadDataset(datasetId, workspaceId);
+    return json({ dataset });
 }
 
 export async function action({ params, request }: ActionArgs) {
@@ -53,12 +57,12 @@ export async function action({ params, request }: ActionArgs) {
     }
 }
 
-function truncate(str: string, n: number) {
-    return str.length > n ? str.slice(0, n - 1) + " ..." : str;
-}
-
 export default function DatasetPage() {
-    const { dataset, tables } = useLoaderData<typeof loader>();
+    const { dataset } = useLoaderData<typeof loader>();
+
+    const queryLoaderData = useRouteLoaderData(
+        "routes/workspace.$workspaceId.dataset.$datasetId.explore.$queryId"
+    ) as any;
 
     return (
         <div className="m-0 p-0">
@@ -70,29 +74,16 @@ export default function DatasetPage() {
             </section>
 
             <section className="my-6 flex justify-between gap-10">
-                <div className="basis-3/4">
+                <div className="grow basis-4/5">
                     <Outlet />
                 </div>
-                <div className="prose basis-1/4">
-                    <h2>Queries</h2>
-                    <ul className="prose">
-                        {dataset.queries.map((q) => {
-                            return (
-                                <li key={q.id}>
-                                    <Link to={`explore/${q.id}`} reloadDocument={true} className="no-underline">
-                                        <code className="p-0">{truncate(q.query, 40)}</code>
-                                    </Link>
-                                </li>
-                            );
-                        })}
-                        <li>
-                            <Link to="explore" reloadDocument={true} className="no-underline">
-                                Add Query
-                            </Link>
-                        </li>
-                    </ul>
-                    <h2>Tables</h2>
-                    <DatasetSchema tables={tables} />
+                <div className="prose grow-0 basis-1/5">
+                    <h3 className="prose">Query Results</h3>
+                    <QueryResultsInspector
+                        className="w-[300px]"
+                        result={queryLoaderData?.result}
+                        error={queryLoaderData?.error}
+                    />
                 </div>
             </section>
         </div>

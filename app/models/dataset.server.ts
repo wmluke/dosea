@@ -1,3 +1,4 @@
+import type { Prisma } from "@prisma/client";
 import { prisma } from "~/db.server";
 
 export type ConnectionType = "sqlite" | "csv";
@@ -18,13 +19,15 @@ export function getDatasetById(id: string) {
     });
 }
 
+export type DatasetWithQueries = Prisma.PromiseReturnType<typeof getDatasetById>;
+
 export function createDataset({ name, type, connection, workspaceId }: DatasetInput) {
     return prisma.dataset.create({
         data: {
             name,
             type,
             connection,
-            workspaced,
+            workspaceId,
         },
     });
 }

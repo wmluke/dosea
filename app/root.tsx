@@ -14,7 +14,7 @@ export const links: LinksFunction = () => {
 export const meta: MetaFunction = () => ({
     charset: "utf-8",
     title: "Databot",
-    viewport: "width=device-width,initial-scale=1,
+    viewport: "width=device-width,initial-scale=1",
 });
 
 function Document({ children, title }: { children: React.ReactNode; title?: string }) {

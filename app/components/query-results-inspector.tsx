@@ -7,7 +7,5 @@ export interface QueryResultsInspectorProps {
 }
 
 export function QueryResultsInspector({ result, error, className }: QueryResultsInspectorProps) {
-    return (
-        <pre className={joinTruthy(["prose text-xs", className], " ")}>{JSON.stringify(result ?? error, null, 2)}</pre>
-    );
+    return <pre className={joinTruthy(["prose", className], " ")}>{JSON.stringify(result ?? error, null, 2)}</pre>;
 }

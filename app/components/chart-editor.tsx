@@ -74,6 +74,7 @@ export function ChartEditor({ data, config, queryId, chartId }: ChartEditorProps
 
     return (
         <>
+            {/* @ts-ignore */}
             <Chart data={data} config={chartConfig}></Chart>
             <form method="post">
                 <div className="form-control">

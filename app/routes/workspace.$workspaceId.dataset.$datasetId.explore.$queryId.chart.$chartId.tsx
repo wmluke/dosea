@@ -4,7 +4,7 @@ import { useLoaderData } from "@remix-run/react";
 import type { ActionArgs } from "@remix-run/server-runtime";
 import { Suspense } from "react";
 import { useRouteLoaderData } from "react-router";
-import { ChartEditor } from "~/components/chart.editor";
+import { ChartEditor } from "~/components/chart-editor";
 import { Loading } from "~/components/loading";
 import { getChartConfigById, saveChartConfig } from "~/models/chartconfig.server";
 import type { QueryResults } from "~/routes/workspace.$workspaceId.dataset.$datasetId.explore.$queryId";
