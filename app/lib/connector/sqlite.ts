@@ -19,21 +19,23 @@ export interface DB {
 
     getTables(): Promise<Table[]>;
 
-    query(sql: string): Promise<any>;
+    queryDangerouslyAndUnsafe(sql: string): Promise<any>;
 }
 
 export class SqliteConnection implements Connection {
-    constructor(private readonly url: string) {}
+    constructor(private readonly url: string) {
+    }
 
     public connect(): Promise<SqliteDatabase> {
-        const db = new Database(this.url);
+        const db = new Database(this.url, { readonly: true });
         db.pragma("journal_mode = WAL");
         return Promise.resolve(new SqliteDatabase(db));
     }
 }
 
 export class SqliteDatabase implements DB {
-    constructor(private readonly db: Database.Database) {}
+    constructor(private readonly db: Database.Database) {
+    }
 
     public close(): Promise<void> {
         this.db.close();
@@ -60,15 +62,15 @@ export class SqliteDatabase implements DB {
                     columns: columns.map(({ name, type }) => {
                         return {
                             name: name as string,
-                            type: type as string,
+                            type: type as string
                         };
-                    }),
+                    })
                 };
             })
         );
     }
 
-    public query(sql: string): Promise<any> {
+    public queryDangerouslyAndUnsafe(sql: string): Promise<any> {
         // console.log('SQL');
         // console.log(sql);
         const r = this.db.prepare(sql).all();

@@ -3,9 +3,18 @@ import { json, redirect } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 import type { ActionArgs } from "@remix-run/server-runtime";
 import { ChartEditor } from "~/components/chart-editor";
-import { getChartConfigById, saveChartConfig } from "~/models/chartconfig.server";
-import { loadQuery, runQuery } from "~/routes/workspace.$workspaceId.dataset.$datasetId.explore.$queryId";
+import { ChartWithQuery, getChartConfigById, saveChartConfig } from "~/models/chartconfig.server";
+import {
+    loadQuery,
+    QueryPageLoaderReturn,
+    runQueryDangerouslyAndUnsafe
+} from "~/routes/workspace.$workspaceId.dataset.$datasetId.explore.$queryId";
 import { badRequest, notFound } from "~/utils";
+
+
+export interface ChartPageLoaderReturn extends QueryPageLoaderReturn {
+    chartConfig: ChartWithQuery;
+}
 
 export async function loader({ params }: LoaderArgs) {
     const { datasetId, queryId, chartId } = params;
@@ -25,9 +34,10 @@ export async function loader({ params }: LoaderArgs) {
     }
 
     const query = await loadQuery({ queryId, datasetId });
-    const queryResult = await runQuery(query);
+    const queryResult = await runQueryDangerouslyAndUnsafe(query);
 
-    return json({ chartConfig, query, queryResult });
+    const returnValue: ChartPageLoaderReturn = { chartConfig, query, queryResult };
+    return json(returnValue);
 }
 
 export async function action({ params, request }: ActionArgs) {
@@ -50,17 +60,28 @@ export async function action({ params, request }: ActionArgs) {
     return redirect(`/workspace/${workspaceId}/dataset/${datasetId}/explore/${queryId}`);
 }
 
-export default function ChartEditorPage() {
-    const data = useLoaderData<typeof loader>();
+function parseConfigJson(json?: string | null) {
+    try {
+        return json ? JSON.parse(json) : undefined;
+    } catch (e) {
+        console.warn("!!! Failed to parse Chart.configJson");
+        console.warn(e);
+        return;
+    }
+}
 
+export default function ChartEditorPage() {
+    const data = useLoaderData<typeof loader>() as ChartPageLoaderReturn;
+    const json = data.chartConfig?.configJson ?? undefined;
+    const config = parseConfigJson(json);
     return (
         <div className="w-full overflow-hidden">
             <ChartEditor
-                className="mx-8 w-full"
+                className="w-full"
                 data={data.queryResult?.result ?? []}
                 queryId={data.query?.id!}
-                chartId={data.chartConfig.id}
-                config={JSON.parse(data.chartConfig.configJson)}
+                chartId={data.chartConfig?.id}
+                config={config}
             />
         </div>
     );

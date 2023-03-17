@@ -14,10 +14,12 @@ export interface QueryError {
     type?: string;
 }
 
-export interface QueryResults<T = Array<Record<string, any>>> {
+export interface QueryPageLoaderReturn<T = Array<Record<string, any>>> {
     query: QueryWithDatasetAndCharts;
-    result?: T;
-    error?: QueryError;
+    queryResult: {
+        result?: T;
+        error?: QueryError;
+    };
 }
 
 function err(e: any): QueryError {
@@ -48,13 +50,18 @@ export async function loadQuery({
     return query;
 }
 
-export async function runQuery<T = ChartData>(query: QueryWithDatasetAndCharts): Promise<{ result?: T, error?: QueryError }> {
+/**
+ * Living pretty dangerously.
+ * This method lacks any safeguards against SQL injection and imposes no controls on the number of query results
+ * TODO: At a minimum: sanitize and validate "sql" input and inject query limits
+ */
+export async function runQueryDangerouslyAndUnsafe<T = ChartData>(query: QueryWithDatasetAndCharts): Promise<{ result?: T, error?: QueryError }> {
     if (!query) {
         return { error: { message: "No query" } };
     }
     const db = await connect(query.dataset.connection, query.dataset.type);
     try {
-        const result = (await db.query(query.query)) as T;
+        const result = (await db.queryDangerouslyAndUnsafe(query.query)) as T;
         return { result };
     } catch (e: any) {
         console.warn("Dataset Explorer Query Error");
@@ -68,8 +75,8 @@ export async function runQuery<T = ChartData>(query: QueryWithDatasetAndCharts):
 export async function loader({ params }: LoaderArgs) {
     const { datasetId, queryId } = params;
     const query = await loadQuery({ queryId, datasetId });
-    const queryResults = await runQuery(query);
-    return json({ queryResults, query });
+    const queryResult = await runQueryDangerouslyAndUnsafe(query);
+    return json({ query, queryResult });
 }
 
 export default function QueryPage() {
@@ -80,7 +87,7 @@ export default function QueryPage() {
 
 
             {/* @ts-ignore */}
-            <ChartsGrid charts={data.query?.charts ?? []} queryResult={data.queryResults.result} />
+            <ChartsGrid charts={data.query?.charts ?? []} queryResult={data.queryResult.result} />
         </div>
     );
 }

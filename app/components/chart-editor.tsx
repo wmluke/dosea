@@ -1,3 +1,4 @@
+import { InformationCircleIcon } from "@heroicons/react/24/solid";
 import type { ChangeEvent } from "react";
 import { useState } from "react";
 import type { ECOption } from "~/components/chart";
@@ -82,7 +83,14 @@ export function ChartEditor({ data, config, queryId, chartId, className }: Chart
                 <div className="form-control">
                     <label className="label">
                         <span className="label-text">Chart Config</span>
-                        <span className="label-text-alt">JSON</span>
+                        <span className="label-text-alt">
+                            <a className="flex gap-1"
+                               href="https://echarts.apache.org/en/option.html"
+                               target="_blank" rel="noreferrer">
+                            <InformationCircleIcon className="h-6 w-6" />
+                            ECharts Config
+                        </a>
+                        </span>
                     </label>
                     <textarea
                         name="configJson"
@@ -90,6 +98,13 @@ export function ChartEditor({ data, config, queryId, chartId, className }: Chart
                         defaultValue={JSON.stringify(chartConfig, null, 4)}
                         onChange={onChange}
                     ></textarea>
+                    <label className="label">
+                        <span className="label-text"></span>
+                        <span className="label-text-alt">JSON</span>
+                    </label>
+
+                </div>
+                <div className="flex justify-end my-6">
                     <button type="submit" className="btn-primary btn" disabled={!isValidJson}>
                         Save
                     </button>
