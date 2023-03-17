@@ -17,9 +17,10 @@ export async function loader({ params }: LoaderArgs) {
 }
 
 export async function action({ params, request }: ActionArgs) {
-    const { workspaceId, datasetId, queryId } = params;
+    const { workspaceId, datasetId } = params;
     await loadDataset(datasetId, workspaceId);
     const form = await request.formData();
+    const queryId = form.get("queryId") as string;
     const q = form.get("q") as string;
     if (!q) {
         throw Error("Missing field q");

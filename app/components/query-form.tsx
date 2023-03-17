@@ -1,5 +1,6 @@
 import type { Dataset, DatasetQuery } from "@prisma/client";
 import { Link } from "@remix-run/react";
+import { joinTruthy } from "~/utils";
 
 export interface QueryFormProps {
     dataset: Dataset;
@@ -20,7 +21,8 @@ function AddChartButton({ queryId }: { queryId?: string }) {
 export function QueryForm({ dataset, query }: QueryFormProps) {
     const { id, workspaceId, type } = dataset;
     return (
-        <form method="post" action={`/workspace/${workspaceId}/dataset/${id}/explore`}>
+        <form method="post" action={joinTruthy(["/workspace", workspaceId, "dataset", id, "explore"], "/")}>
+            <input type="hidden" name="queryId" value={query?.id} />
             <div className="form-control">
                 <label className="label">
                     <span className="label-text">Query</span>
