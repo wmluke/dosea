@@ -62,7 +62,7 @@ export default function () {
             <Suspense fallback={<Loading />}>
                 <ChartEditor
                     data={result}
-                    queryId={query.id}
+                    queryId={query?.id!}
                     chartId={chartConfig.id}
                     config={JSON.parse(chartConfig.configJson)}
                 />

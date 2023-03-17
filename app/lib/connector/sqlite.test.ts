@@ -2,7 +2,7 @@ import { expect, test } from "vitest";
 import { SqliteConnection } from "~/lib/connector/sqlite";
 
 test("should describe db tables", async () => {
-    const connection = new SqliteConnection("./prisma/data.db");
+    const connection = new SqliteConnection("./fixtures/data.db");
 
     const sqliteDatabase = await connection.connect();
     const tables = await sqliteDatabase.getTables();

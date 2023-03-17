@@ -8,7 +8,10 @@ node_modules
 /cypress/videos
 /prisma/data.db
 /prisma/data.db-journal
+/prisma/data.db-shm
+/prisma/data.db-wal
 
 /app/styles/app.css
 
 .idea
+/coverage
