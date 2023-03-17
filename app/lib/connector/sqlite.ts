@@ -1,4 +1,49 @@
 import Database from "better-sqlite3";
+import * as os from "os";
+
+function isMacOS(): boolean {
+    return os.platform().toLowerCase().includes("darwin");
+}
+
+function isLinux(): boolean {
+    return os.platform().toLowerCase().includes("linux");
+}
+
+function isWindows() {
+    return os.platform().toLowerCase().includes("win");
+}
+
+function isArm(): boolean {
+    return os.arch().toLowerCase().includes("arm");
+}
+
+function isX86(): boolean {
+    return os.arch().toLowerCase().includes("x86");
+}
+
+function getDist(): string | undefined {
+    if (isMacOS() && isArm()) {
+        return "macos-arm64";
+    }
+    if (isLinux() && isX86()) {
+        return "linux-x86";
+    }
+    return;
+}
+
+const getExtension = (): string | undefined => {
+    if (isWindows()) {
+        return "dll";
+    }
+    if (isLinux()) {
+        return "so";
+    }
+    if (isMacOS()) {
+        return "dylib";
+    }
+    return;
+};
+
 
 export interface Connection {
     connect(): Promise<DB>;
@@ -23,17 +68,35 @@ export interface DB {
 }
 
 export class SqliteConnection implements Connection {
-    constructor(private readonly url: string) {}
+    constructor(private readonly url: string) {
+    }
 
     public connect(): Promise<SqliteDatabase> {
         const db = new Database(this.url);
         db.pragma("journal_mode = WAL");
+        SqliteConnection.loadSqleanExtensions(db);
         return Promise.resolve(new SqliteDatabase(db));
+    }
+
+    static loadSqleanExtensions(db: Database.Database) {
+        const dist = getDist();
+        const ext = getExtension();
+        if (!dist || !ext) {
+            console.warn("Failed to determine sqlean build");
+            return;
+        }
+        try {
+            db.loadExtension(`bin/sqlean/0.19.3/${dist}/stats.${ext}`);
+        } catch (e) {
+            console.error("!!! Failed to load sqlean extensions");
+            console.error(e);
+        }
     }
 }
 
 export class SqliteDatabase implements DB {
-    constructor(private readonly db: Database.Database) {}
+    constructor(private readonly db: Database.Database) {
+    }
 
     public close(): Promise<void> {
         this.db.close();
@@ -60,9 +123,9 @@ export class SqliteDatabase implements DB {
                     columns: columns.map(({ name, type }) => {
                         return {
                             name: name as string,
-                            type: type as string,
+                            type: type as string
                         };
-                    }),
+                    })
                 };
             })
         );
