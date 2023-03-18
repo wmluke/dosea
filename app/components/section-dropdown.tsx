@@ -6,7 +6,7 @@ export interface SectionDropdownProps {
 }
 
 export function SectionDropdown({ children }: PropsWithChildren<SectionDropdownProps>) {
-    return <div className="dropdown dropdown-hover dropdown-bottom dropdown-end">
+    return <div className="dropdown dropdown-hover dropdown-left">
         <label tabIndex={0} className="btn btn-xs btn-square btn-info">
             <EllipsisHorizontalIcon className="w-6 h-6" />
         </label>
