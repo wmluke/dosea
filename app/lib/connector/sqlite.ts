@@ -73,6 +73,25 @@ export interface DB {
     exec(sql: string): Promise<any>;
 }
 
+/**
+ * https://github.com/nalgeon/sqlean
+ */
+const sqleanExtensions = [
+    "crypto",
+    //"define",
+    //"fileio",
+    "fuzzy",
+    "ipaddr",
+    "json1",
+    "math",
+    "regexp",
+    "stats",
+    "text",
+    "unicode",
+    "uuid",
+    "vsv"
+];
+
 export class SqliteConnection implements Connection {
     constructor(private readonly url: string) {
     }
@@ -85,16 +104,19 @@ export class SqliteConnection implements Connection {
 
     static loadSqleanExtensions(db: Database.Database) {
         const dist = getDist();
-        const ext = getExtension();
-        if (!dist || !ext) {
+        if (!dist) {
             console.warn("Failed to determine sqlean build");
             return;
         }
-        try {
-            db.loadExtension(`bin/sqlean/0.19.3/${dist}/stats.${ext}`);
-        } catch (e) {
-            console.error("!!! Failed to load sqlean extensions");
-            console.error(e);
+        for (const extension of sqleanExtensions) {
+            const path = `bin/sqlean/0.19.3/${dist}/${extension}`;
+            try {
+                db.loadExtension(path);
+                console.log(`Loaded sqlite sqlean ${extension} extension`);
+            } catch (e) {
+                console.error(`! Failed to load sqlean ${extension} extension`);
+                console.error(e);
+            }
         }
     }
 }
