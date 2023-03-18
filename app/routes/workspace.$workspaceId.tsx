@@ -10,7 +10,7 @@ import { getDatasetById } from "~/models/dataset.server";
 import type { WorkspaceWithDatasets } from "~/models/workspace.server";
 import { getWorkspaceById } from "~/models/workspace.server";
 import { loadDatasetTable } from "~/routes/workspace.$workspaceId.dataset.$datasetId";
-import type { QueryResults } from "~/routes/workspace.$workspaceId.dataset.$datasetId.explore.$queryId";
+import type { QueryPageLoaderReturn } from "~/routes/workspace.$workspaceId.dataset.$datasetId.explore.$queryId";
 import { notFound } from "~/utils";
 
 interface LoaderResponse {
@@ -40,9 +40,14 @@ export async function loader({ params }: LoaderArgs) {
 export default function WorkspacePage() {
     const { workspace, dataset, tables } = useLoaderData<typeof loader>() as LoaderResponse;
 
-    const queryLoaderData = useRouteLoaderData(
+    // OMG!!! THIS IS HORRIBLE CODESMELL!!!!
+    const queryPageLoaderData = useRouteLoaderData(
         "routes/workspace.$workspaceId.dataset.$datasetId.explore.$queryId"
-    ) as QueryResults;
+    ) as QueryPageLoaderReturn;
+    const chartsPageLoaderData = useRouteLoaderData(
+        "routes/workspace.$workspaceId.dataset.$datasetId.explore.$queryId_.chart.$chartId"
+    ) as QueryPageLoaderReturn;
+    const queryLoaderData = queryPageLoaderData ?? chartsPageLoaderData;
 
     return (
         <div className="drawer-mobile drawer">
@@ -78,8 +83,8 @@ export default function WorkspacePage() {
                     </div>
                     <div className="prose grow-0 basis-1/5">
                         <RightPane
-                            queryResult={queryLoaderData?.result}
-                            queryError={queryLoaderData?.error}
+                            queryResult={queryLoaderData?.queryResult?.result}
+                            queryError={queryLoaderData?.queryResult?.error}
                             tables={tables}
                         />
                     </div>

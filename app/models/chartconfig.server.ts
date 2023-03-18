@@ -1,3 +1,4 @@
+import type { Prisma } from "@prisma/client";
 import { prisma } from "~/db.server";
 
 export interface ChartConfigInput {
@@ -8,14 +9,22 @@ export interface ChartConfigInput {
 }
 
 export function getChartConfigById(id: string) {
-    return prisma.chartConfig.findUnique({ where: { id } });
+    return prisma.chartConfig.findUnique({
+        where: { id },
+        include: { query: true }
+    });
 }
+
+export type ChartWithQuery = Prisma.PromiseReturnType<typeof getChartConfigById>
 
 export function getChartConfigsByQueryId(queryId: string) {
     return prisma.chartConfig.findMany({
         where: {
-            queryId,
+            queryId
         },
+        include: {
+            query: true
+        }
     });
 }
 
@@ -23,11 +32,11 @@ export function saveChartConfig({ id, configJson, queryId, type }: ChartConfigIn
     if (id) {
         return prisma.chartConfig.update({
             data: { configJson, type },
-            where: { id },
+            where: { id }
         });
     }
     return prisma.chartConfig.create({
-        data: { configJson, queryId, type },
+        data: { configJson, queryId, type }
     });
 }
 

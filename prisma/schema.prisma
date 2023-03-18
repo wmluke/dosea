@@ -13,8 +13,8 @@ model Dataset {
     type       String
     connection String
 
-    workspace   Workspace? @relation(fields: [workspaceId], references: [id], onDelete: SetNull, onUpdate: NoAction)
-    workspaceId String?
+    workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+    workspaceId String
 
     queries DatasetQuery[]
 
@@ -35,7 +35,7 @@ model DatasetQuery {
     id        String  @id @default(cuid())
     name      String?
     query     String
-    dataset   Dataset @relation(fields: [datasetId], references: [id])
+    dataset   Dataset @relation(fields: [datasetId], references: [id], onDelete: Cascade, onUpdate: NoAction)
     datasetId String
 
     createdAt DateTime      @default(now())

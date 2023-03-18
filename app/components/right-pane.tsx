@@ -1,9 +1,10 @@
+import type { ChartData } from "~/components/chart";
 import { DatasetSchema } from "~/components/dataset-schema";
 import { QueryResultsInspector } from "~/components/query-results-inspector";
 import type { Table } from "~/lib/connector/sqlite";
 import type { QueryError } from "~/routes/workspace.$workspaceId.dataset.$datasetId.explore.$queryId";
 
-export interface RightPaneProps<T = Array<Record<string, any>>> {
+export interface RightPaneProps<T = ChartData> {
     queryResult?: T | null;
     queryError?: QueryError;
     tables?: Table[];

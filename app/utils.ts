@@ -77,13 +77,13 @@ export function useLocalStorage<T>(key: string, initialValue: T) {
 
 export function notFound(message?: string) {
     return new Response(["Not Found", message].filter(Boolean).join(": "), {
-        status: 404,
+        status: 404
     });
 }
 
 export function badRequest(message?: string) {
     return new Response(["Bad Request", message].filter(Boolean).join(": "), {
-        status: 400,
+        status: 400
     });
 }
 
@@ -98,3 +98,15 @@ export function classNames(...classes: Array<string | undefined | null>) {
 export function truncate(str: string, n: number) {
     return str.length > n ? str.slice(0, n - 1) + " ..." : str;
 }
+
+export function isEmpty(o?: Object | Array<any> | string | null): boolean {
+    return !o || Object.keys(o).length === 0;
+}
+
+export type ConvertDatesToStrings<T> = T extends Date
+    ? string
+    : T extends Array<infer U>
+        ? ConvertDatesToStrings<U>[]
+        : T extends object
+            ? { [K in keyof T]: ConvertDatesToStrings<T[K]> }
+            : T;

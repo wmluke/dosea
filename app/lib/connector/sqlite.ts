@@ -45,8 +45,12 @@ const getExtension = (): string | undefined => {
 };
 
 
+export interface ConnectionOptions {
+    readonly?: boolean;
+}
+
 export interface Connection {
-    connect(): Promise<DB>;
+    connect(opts?: ConnectionOptions): Promise<DB>;
 }
 
 export interface Column {
@@ -65,15 +69,16 @@ export interface DB {
     getTables(): Promise<Table[]>;
 
     query(sql: string): Promise<any>;
+
+    exec(sql: string): Promise<any>;
 }
 
 export class SqliteConnection implements Connection {
     constructor(private readonly url: string) {
     }
 
-    public connect(): Promise<SqliteDatabase> {
-        const db = new Database(this.url);
-        db.pragma("journal_mode = WAL");
+    public connect({ readonly = true }: ConnectionOptions = {}): Promise<SqliteDatabase> {
+        const db = new Database(this.url, { readonly });
         SqliteConnection.loadSqleanExtensions(db);
         return Promise.resolve(new SqliteDatabase(db));
     }
@@ -132,11 +137,12 @@ export class SqliteDatabase implements DB {
     }
 
     public query(sql: string): Promise<any> {
-        // console.log('SQL');
-        // console.log(sql);
         const r = this.db.prepare(sql).all();
-        // console.log('RESULTS')
-        // console.log(r)
+        return Promise.resolve(r);
+    }
+
+    public exec(sql: string): Promise<any> {
+        const r = this.db.prepare(sql).run();
         return Promise.resolve(r);
     }
 }

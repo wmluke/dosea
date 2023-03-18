@@ -1,21 +1,9 @@
 import type { Dataset, DatasetQuery } from "@prisma/client";
-import { Link } from "@remix-run/react";
 import { joinTruthy } from "~/utils";
 
 export interface QueryFormProps {
     dataset: Dataset;
     query?: Partial<DatasetQuery> | null;
-}
-
-function AddChartButton({ queryId }: { queryId?: string }) {
-    if (!queryId) {
-        return <></>;
-    }
-    return (
-        <Link className="btn-secondary btn-sm btn" to={`${queryId}/chart/add`}>
-            Add Chart
-        </Link>
-    );
 }
 
 export function QueryForm({ dataset, query }: QueryFormProps) {
@@ -25,7 +13,7 @@ export function QueryForm({ dataset, query }: QueryFormProps) {
             <input type="hidden" name="queryId" value={query?.id} />
             <div className="form-control">
                 <label className="label">
-                    <span className="label-text">Query</span>
+                    <span className="label-text">SQL</span>
                     <span className="label-text-alt">{type}</span>
                 </label>
                 <textarea
@@ -35,7 +23,7 @@ export function QueryForm({ dataset, query }: QueryFormProps) {
                     placeholder="Select * FROM..."
                 ></textarea>
             </div>
-            <div className="my-4 flex items-center justify-between">
+            <div className="mt-4 flex items-center justify-between">
                 <button className="btn-primary btn-sm btn gap-2">
                     <svg
                         xmlns="http://www.w3.org/2000/svg"
@@ -53,7 +41,6 @@ export function QueryForm({ dataset, query }: QueryFormProps) {
                     </svg>
                     Run
                 </button>
-                <AddChartButton queryId={query?.id} />
             </div>
         </form>
     );

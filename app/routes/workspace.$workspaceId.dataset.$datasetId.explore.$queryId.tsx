@@ -1,12 +1,14 @@
+import { ChartPieIcon } from "@heroicons/react/24/solid";
 import type { LoaderArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
-import { Link, Outlet, useLoaderData } from "@remix-run/react";
-import { Responsive, WidthProvider } from "react-grid-layout";
-import { Chart } from "~/components/chart";
+import { Link, useLoaderData } from "@remix-run/react";
+import type { ChartData } from "~/components/chart";
+import { ChartsGrid } from "~/components/charts-grid";
+import { SectionDropdown } from "~/components/section-dropdown";
 import { connect } from "~/lib/connector/sqlite";
 import type { QueryWithDatasetAndCharts } from "~/models/query.server";
 import { getQueryById } from "~/models/query.server";
-import { badRequest, joinTruthy, notFound } from "~/utils";
+import { badRequest, notFound } from "~/utils";
 
 export interface QueryError {
     code?: string;
@@ -14,24 +16,26 @@ export interface QueryError {
     type?: string;
 }
 
-export interface QueryResults<T = Array<Record<string, any>>> {
+export interface QueryPageLoaderReturn<T = Array<Record<string, any>>> {
     query: QueryWithDatasetAndCharts;
-    result?: T;
-    error?: QueryError;
+    queryResult: {
+        result?: T;
+        error?: QueryError;
+    };
 }
 
 function err(e: any): QueryError {
     return {
         code: e?.code,
         message: e?.message,
-        type: e?.name ?? typeof e,
+        type: e?.name ?? typeof e
     };
 }
 
 export async function loadQuery({
-    queryId,
-    datasetId,
-}: {
+                                    queryId,
+                                    datasetId
+                                }: {
     queryId?: string;
     datasetId?: string;
 }): Promise<QueryWithDatasetAndCharts> {
@@ -48,74 +52,63 @@ export async function loadQuery({
     return query;
 }
 
-export async function loader({ params }: LoaderArgs) {
-    const { datasetId, queryId } = params;
-    const query = await loadQuery({ queryId, datasetId });
-
-    const db = await connect(query!.dataset.connection, query!.dataset.type);
+/**
+ * Living pretty dangerously.
+ * This method lacks any safeguards against SQL injection and imposes no controls on the number of query results
+ * TODO: At a minimum: sanitize and validate "sql" input and inject query limits
+ */
+export async function runQueryDangerouslyAndUnsafe<T = ChartData>(query: QueryWithDatasetAndCharts): Promise<{ result?: T, error?: QueryError }> {
+    if (!query) {
+        return { error: { message: "No query" } };
+    }
+    const db = await connect(query.dataset.connection, query.dataset.type);
     try {
-        const result = await db.query(query!.query);
-        return json({ query, result } as QueryResults);
+        const result = (await db.query(query.query)) as T;
+        return { result };
     } catch (e: any) {
         console.warn("Dataset Explorer Query Error");
         console.warn(e);
-        return json({ query, error: err(e) } as QueryResults);
+        return { error: err(e) };
     } finally {
         await db.close();
     }
 }
 
-const ResponsiveGridLayout = WidthProvider(Responsive);
-
-function gridItemLayout(i: number) {
-    return {
-        x: 0,
-        y: i,
-        h: 1,
-        w: 2,
-        i: i + "",
-    };
+export async function loader({ params }: LoaderArgs) {
+    const { datasetId, queryId } = params;
+    const query = await loadQuery({ queryId, datasetId });
+    const queryResult = await runQueryDangerouslyAndUnsafe(query);
+    return json({ query, queryResult });
 }
 
 export default function QueryPage() {
     const data = useLoaderData<typeof loader>();
+    const query = data.query;
+    const addChartUrl = [
+        "/workspace",
+        query?.dataset.workspaceId,
+        "dataset",
+        query?.datasetId,
+        "explore",
+        query?.id,
+        "chart/add"
+    ].join("/");
     return (
-        <div className="w-full overflow-hidden">
-            <Outlet />
-            <ResponsiveGridLayout
-                rowHeight={500}
-                breakpoints={{ lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 }}
-                cols={{ lg: 3, md: 2, sm: 2, xs: 2, xxs: 2 }}
-            >
-                {data.query?.charts?.map((chart, i) => {
-                    return (
-                        <div
-                            key={chart.id}
-                            className="card card-compact w-full bg-base-100 shadow-xl"
-                            data-grid={gridItemLayout(i)}
-                        >
-                            <Chart data={data.result ?? []} config={JSON.parse(chart.configJson)} />
-
-                            <div className="card-body">
-                                <div className="card-actions justify-end">
-                                    <Link
-                                        to={joinTruthy(["chart", chart.id], "/")}
-                                        className="btn-secondary btn-xs btn"
-                                    >
-                                        Edit
-                                    </Link>
-                                    <Link
-                                        to={joinTruthy(["chart", chart.id, "delete"], "/")}
-                                        className="btn-info btn-xs btn"
-                                    >
-                                        Delete
-                                    </Link>
-                                </div>
-                            </div>
-                        </div>
-                    );
-                })}
-            </ResponsiveGridLayout>
-        </div>
+        <section id="charts-grid" className="w-full overflow-hidden">
+            <div className="flex justify-between mt-6">
+                <h3 className="prose text-xl flex gap-2">
+                    <ChartPieIcon className="w-7 h-7" />
+                    Charts
+                </h3>
+                <SectionDropdown>
+                    <Link className="text-sm"
+                          to={addChartUrl}
+                          reloadDocument>
+                        Add Chart
+                    </Link>
+                </SectionDropdown>
+            </div>
+            <ChartsGrid charts={query?.charts ?? []} queryResult={data.queryResult.result} />
+        </section>
     );
 }
