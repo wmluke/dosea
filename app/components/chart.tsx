@@ -43,6 +43,7 @@ export function Chart({ data, config }: ChartProps) {
             option={chartOptions}
             notMerge={true}
             lazyUpdate={true}
+            theme="dark"
             style={{ height: "100% !important" }}
             className="h-full w-full overflow-hidden"
         />

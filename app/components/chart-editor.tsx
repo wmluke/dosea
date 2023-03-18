@@ -3,7 +3,7 @@ import type { ChangeEvent } from "react";
 import { useState } from "react";
 import type { ECOption } from "~/components/chart";
 import { Chart } from "~/components/chart";
-import { useLocalStorage } from "~/utils";
+import { isEmpty, useLocalStorage } from "~/utils";
 
 export interface ChartEditorProps {
     data?: any;
@@ -56,9 +56,10 @@ const defaultConfig: ECOption = {
 };
 
 export function ChartEditor({ data, config, queryId, chartId, className }: ChartEditorProps) {
+    const key = ["chartconfig", queryId, chartId ?? "new"].join(".");
     const [chartConfig, setChartConfig] = useLocalStorage<ECOption>(
-        ["chartconfig", queryId, chartId ?? "new"].join("."),
-        config ?? { ...defaultConfig }
+        key,
+        isEmpty(config) ? { ...defaultConfig } : config!
     );
 
     const [isValidJson, setValidJson] = useState(true);

@@ -3,13 +3,13 @@ import { json } from "@remix-run/node";
 import { Link, useLoaderData } from "@remix-run/react";
 import { getWorkspaces } from "~/models/workspace.server";
 
-export async function loader({request, params}: LoaderArgs) {
+export async function loader(_args: LoaderArgs) {
     const workspaces = await getWorkspaces();
-    return json({workspaces});
+    return json({ workspaces });
 }
 
 export default function _index() {
-    const {workspaces} = useLoaderData<typeof loader>();
+    const { workspaces } = useLoaderData<typeof loader>();
     return (
         <div className="hero min-h-screen bg-base-200">
             <div className="hero-content text-center">

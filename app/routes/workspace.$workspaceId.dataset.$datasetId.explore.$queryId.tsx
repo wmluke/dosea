@@ -1,8 +1,10 @@
+import { ChartPieIcon } from "@heroicons/react/24/solid";
 import type { LoaderArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
-import { Outlet, useLoaderData } from "@remix-run/react";
+import { Link, useLoaderData } from "@remix-run/react";
 import type { ChartData } from "~/components/chart";
 import { ChartsGrid } from "~/components/charts-grid";
+import { SectionDropdown } from "~/components/section-dropdown";
 import { connect } from "~/lib/connector/sqlite";
 import type { QueryWithDatasetAndCharts } from "~/models/query.server";
 import { getQueryById } from "~/models/query.server";
@@ -61,7 +63,7 @@ export async function runQueryDangerouslyAndUnsafe<T = ChartData>(query: QueryWi
     }
     const db = await connect(query.dataset.connection, query.dataset.type);
     try {
-        const result = (await db.queryDangerouslyAndUnsafe(query.query)) as T;
+        const result = (await db.query(query.query)) as T;
         return { result };
     } catch (e: any) {
         console.warn("Dataset Explorer Query Error");
@@ -81,13 +83,32 @@ export async function loader({ params }: LoaderArgs) {
 
 export default function QueryPage() {
     const data = useLoaderData<typeof loader>();
+    const query = data.query;
+    const addChartUrl = [
+        "/workspace",
+        query?.dataset.workspaceId,
+        "dataset",
+        query?.datasetId,
+        "explore",
+        query?.id,
+        "chart/add"
+    ].join("/");
     return (
-        <div className="w-full overflow-hidden">
-            <Outlet />
-
-
-            {/* @ts-ignore */}
-            <ChartsGrid charts={data.query?.charts ?? []} queryResult={data.queryResult.result} />
-        </div>
+        <section id="charts-grid" className="w-full overflow-hidden">
+            <div className="flex justify-between mt-6">
+                <h3 className="prose text-xl flex gap-2">
+                    <ChartPieIcon className="w-7 h-7" />
+                    Charts
+                </h3>
+                <SectionDropdown>
+                    <Link className="text-sm"
+                          to={addChartUrl}
+                          reloadDocument>
+                        Add Chart
+                    </Link>
+                </SectionDropdown>
+            </div>
+            <ChartsGrid charts={query?.charts ?? []} queryResult={data.queryResult.result} />
+        </section>
     );
 }

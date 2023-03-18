@@ -3,6 +3,7 @@ import { Link } from "@remix-run/react";
 import { Responsive, WidthProvider } from "react-grid-layout";
 import type { ChartData } from "~/components/chart";
 import { Chart } from "~/components/chart";
+import type { ConvertDatesToStrings } from "~/utils";
 import { joinTruthy } from "~/utils";
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
@@ -17,8 +18,9 @@ function gridItemLayout(i: number) {
     };
 }
 
+
 export interface ChartsGridProps<T = ChartData> {
-    charts?: ChartConfig[];
+    charts?: ConvertDatesToStrings<ChartConfig>[];
     queryResult?: T;
 }
 

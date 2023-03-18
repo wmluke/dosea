@@ -1,22 +1,46 @@
-import { expect, test } from "vitest";
+import { describe, expect, test } from "vitest";
+import type { SqliteDatabase } from "~/lib/connector/sqlite";
 import { SqliteConnection } from "~/lib/connector/sqlite";
 
-test("should describe db tables", async () => {
-    const connection = new SqliteConnection("./fixtures/data.db");
+describe("SqliteDatabase", () => {
 
-    const sqliteDatabase = await connection.connect();
-    const tables = await sqliteDatabase.getTables();
+    let db: SqliteDatabase;
 
-    expect(tables).toBeDefined();
-    expect(tables).toContainEqual({
-        name: "Workspace",
-        columns: [
-            { name: "id", type: "TEXT" },
-            { name: "name", type: "TEXT" },
-            { name: "createdAt", type: "DATETIME" },
-            { name: "updatedAt", type: "DATETIME" },
-        ],
+    beforeEach(async () => {
+        const connection = new SqliteConnection(":memory:");
+        db = await connection.connect({ readonly: false });
+        await db.exec(`
+            CREATE TABLE "Workspace"
+            (
+                "id"        TEXT     NOT NULL PRIMARY KEY,
+                "name"      TEXT     NOT NULL,
+                "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                "updatedAt" DATETIME NOT NULL
+            );
+        `);
     });
 
-    await sqliteDatabase.close();
+    afterEach(() => {
+        db.close();
+    });
+
+    describe("getTables", () => {
+
+        test("should describe db tables", async () => {
+            const tables = await db.getTables();
+
+            expect(tables).toBeDefined();
+            expect(tables).toContainEqual({
+                name: "Workspace",
+                columns: [
+                    { name: "id", type: "TEXT" },
+                    { name: "name", type: "TEXT" },
+                    { name: "createdAt", type: "DATETIME" },
+                    { name: "updatedAt", type: "DATETIME" }
+                ]
+            });
+        });
+    });
 });
+
+

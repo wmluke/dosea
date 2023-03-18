@@ -63,7 +63,6 @@ export default function DatasetAddPage() {
                     </label>
                     <select name="type" className="select-bordered select w-full max-w-xs">
                         <option value="sqlite">Sqlite</option>
-                        <option value="csv">CSV</option>
                     </select>
                 </div>
                 <div className="form-control">

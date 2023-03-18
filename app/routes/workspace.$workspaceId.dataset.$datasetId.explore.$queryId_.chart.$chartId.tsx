@@ -1,3 +1,4 @@
+import { ChartPieIcon } from "@heroicons/react/24/solid";
 import type { LoaderArgs } from "@remix-run/node";
 import { json, redirect } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
@@ -75,7 +76,11 @@ export default function ChartEditorPage() {
     const json = data.chartConfig?.configJson ?? undefined;
     const config = parseConfigJson(json);
     return (
-        <div className="w-full overflow-hidden">
+        <section id="chart-editor" className="w-full overflow-hidden">
+            <h3 className="prose text-xl flex gap-2 mt-6">
+                <ChartPieIcon className="w-7 h-7" />
+                Chart Editor
+            </h3>
             <ChartEditor
                 className="w-full"
                 data={data.queryResult?.result ?? []}
@@ -83,6 +88,6 @@ export default function ChartEditorPage() {
                 chartId={data.chartConfig?.id}
                 config={config}
             />
-        </div>
+        </section>
     );
 }
