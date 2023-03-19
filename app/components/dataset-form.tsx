@@ -15,14 +15,16 @@ export function DatasetForm(dataset: Partial<DatasetInput> & { workspaceId: stri
                     <label className="label">
                         <span className="label-text">Name</span>
                     </label>
-                    <input type="text" name="name" defaultValue={dataset.name} placeholder="Name"
+                    <input id="input-for-dataset-name" type="text" name="name" defaultValue={dataset.name}
+                           placeholder="Name"
                            className="input-bordered input" />
                 </div>
                 <div className="form-control">
                     <label className="label">
                         <span className="label-text">Type</span>
                     </label>
-                    <select name="type" defaultValue={dataset.type} className="select-bordered select w-full max-w-xs">
+                    <select id="select-for-dataset-type" name="type" defaultValue={dataset.type}
+                            className="select-bordered select w-full max-w-xs">
                         <option value="sqlite">Sqlite</option>
                     </select>
                 </div>
@@ -30,7 +32,8 @@ export function DatasetForm(dataset: Partial<DatasetInput> & { workspaceId: stri
                     <label className="label">
                         <span className="label-text">Connection</span>
                     </label>
-                    <input type="text" name="connection" defaultValue={dataset.connection} placeholder="connection"
+                    <input id="input-for-dataset-connection" type="text" name="connection"
+                           defaultValue={dataset.connection} placeholder="connection"
                            className="input-bordered input" />
                 </div>
 

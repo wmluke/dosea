@@ -1,51 +1,28 @@
-import { faker } from "@faker-js/faker";
-
 describe("smoke tests", () => {
     afterEach(() => {
-        cy.cleanupUser();
+        // cy.cleanupUser();
     });
 
-    it("should allow you to register and login", () => {
-        const loginForm = {
-            email: `${faker.internet.userName()}@example.com`,
-            password: faker.internet.password(),
-        };
+    it("should allow user to add a dataset to the default workspace", () => {
 
-        cy.then(() => ({ email: loginForm.email })).as("user");
+        cy.viewport("macbook-16");
 
         cy.visitAndCheck("/");
 
-        cy.findByRole("link", { name: /sign up/i }).click();
+        cy.findByRole("link", { name: /default workspace/i }).click();
+        cy.findByRole("link", { name: /new dataset/i }).click();
 
-        cy.findByRole("textbox", { name: /email/i }).type(loginForm.email);
-        cy.findByLabelText(/password/i).type(loginForm.password);
-        cy.findByRole("button", { name: /create account/i }).click();
+        cy.wait(200);
 
-        cy.findByRole("link", { name: /notes/i }).click();
-        cy.findByRole("button", { name: /logout/i }).click();
-        cy.findByRole("link", { name: /log in/i });
-    });
+        cy.get("#input-for-dataset-name").type("a dataset 123");
+        cy.get("#select-for-dataset-type").select("Sqlite");
+        cy.get("#input-for-dataset-connection").type("./fixtures/foobar.db");
 
-    it("should allow you to make a note", () => {
-        const testNote = {
-            title: faker.lorem.words(1),
-            body: faker.lorem.sentences(1),
-        };
-        cy.login();
+        cy.findByRole("button", { name: /add dataset/i }).click();
 
-        cy.visitAndCheck("/");
+        cy.wait(200);
 
-        cy.findByRole("link", { name: /notes/i }).click();
-        cy.findByText("No notes yet");
+        cy.findByRole("link", { name: /a dataset 123/i }).click();
 
-        cy.findByRole("link", { name: /\+ new note/i }).click();
-
-        cy.findByRole("textbox", { name: /title/i }).type(testNote.title);
-        cy.findByRole("textbox", { name: /body/i }).type(testNote.body);
-        cy.findByRole("button", { name: /save/i }).click();
-
-        cy.findByRole("button", { name: /delete/i }).click();
-
-        cy.findByText("No notes yet");
     });
 });
