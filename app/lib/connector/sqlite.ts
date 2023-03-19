@@ -21,11 +21,15 @@ function isX86(): boolean {
     return os.arch().toLowerCase().includes("x86");
 }
 
+function isX64(): boolean {
+    return os.arch().toLowerCase().includes("x64");
+}
+
 function getDist(): string | undefined {
     if (isMacOS() && isArm()) {
         return "macos-arm64";
     }
-    if (isLinux() && isX86()) {
+    if (isLinux() && (isX86() || isX64)) {
         return "linux-x86";
     }
     return;
