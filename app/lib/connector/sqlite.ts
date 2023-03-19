@@ -105,7 +105,7 @@ export class SqliteConnection implements Connection {
     static loadSqleanExtensions(db: Database.Database) {
         const dist = getDist();
         if (!dist) {
-            console.warn("Failed to determine sqlean build");
+            console.warn(`Failed to determine sqlean build for ${os.platform()} / ${os.arch()}`);
             return;
         }
         for (const extension of sqleanExtensions) {
