@@ -45,7 +45,7 @@ export function Chart({ data, config }: ChartProps) {
             lazyUpdate={true}
             theme="dark"
             style={{ height: "100% !important" }}
-            className="h-full w-full overflow-hidden"
+            className="h-full w-full overflow-hidden rounded-lg"
         />
     );
 }

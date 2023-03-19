@@ -26,11 +26,11 @@ function Document({ children, title }: { children: React.ReactNode; title?: stri
                 <Meta />
                 <Links />
             </head>
-            <body className="relative flex min-h-screen w-full bg-gray-900 text-gray-200">
-                {children}
-                <ScrollRestoration />
-                <Scripts />
-                {process.env.NODE_ENV === "development" ? <LiveReload /> : null}
+            <body className="relative flex min-h-screen w-full">
+            {children}
+            <ScrollRestoration />
+            <Scripts />
+            {process.env.NODE_ENV === "development" ? <LiveReload /> : null}
             </body>
         </html>
     );
