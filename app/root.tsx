@@ -30,6 +30,7 @@ function Document({ children, title }: { children: React.ReactNode; title?: stri
             {children}
             <ScrollRestoration />
             <Scripts />
+            <script defer data-domain="dosea-7b28.fly.dev" src="https://plausible.io/js/script.js"></script>
             {process.env.NODE_ENV === "development" ? <LiveReload /> : null}
             </body>
         </html>
