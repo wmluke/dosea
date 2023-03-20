@@ -2,7 +2,7 @@ import type { ChartData } from "~/components/chart";
 import { DatasetSchema } from "~/components/dataset-schema";
 import { QueryResultsInspector } from "~/components/query-results-inspector";
 import type { Table } from "~/lib/connector/sqlite";
-import type { QueryError } from "~/routes/workspace.$workspaceId.dataset.$datasetId.explore.$queryId";
+import { QueryError } from "~/lib/query.cache";
 
 export interface RightPaneProps<T = ChartData> {
     queryResult?: T | null;

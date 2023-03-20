@@ -4,12 +4,10 @@ import { json, redirect } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 import type { ActionArgs } from "@remix-run/server-runtime";
 import { ChartEditor } from "~/components/chart-editor";
-import { ChartWithQuery, getChartConfigById, saveChartConfig } from "~/models/chartconfig.server";
-import {
-    loadQuery,
-    QueryPageLoaderReturn,
-    runQueryDangerouslyAndUnsafe
-} from "~/routes/workspace.$workspaceId.dataset.$datasetId.explore.$queryId";
+import { loadQuery, runQuery } from "~/lib/query.cache";
+import type { ChartWithQuery } from "~/models/chartconfig.server";
+import { getChartConfigById, saveChartConfig } from "~/models/chartconfig.server";
+import type { QueryPageLoaderReturn } from "~/routes/workspace.$workspaceId.dataset.$datasetId.explore.$queryId";
 import { badRequest, notFound } from "~/utils";
 
 
@@ -35,7 +33,7 @@ export async function loader({ params }: LoaderArgs) {
     }
 
     const query = await loadQuery({ queryId, datasetId });
-    const queryResult = await runQueryDangerouslyAndUnsafe(query);
+    const queryResult = await runQuery({ queryId, datasetId }) as any;
 
     const returnValue: ChartPageLoaderReturn = { chartConfig, query, queryResult };
     return json(returnValue);

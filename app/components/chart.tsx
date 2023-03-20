@@ -28,14 +28,16 @@ export interface ChartProps<T = ChartData> {
     data?: T;
 
     config?: ECOption;
+
+    width?: number;
 }
 
-export function Chart({ data, config }: ChartProps) {
+export function Chart({ data, config, width }: ChartProps) {
     const chartOptions: ECOption = {
         dataset: {
             source: data
         },
-        ...(config ?? {}),
+        ...(config ?? {})
     };
     return (
         <ReactEChartsCore
@@ -44,7 +46,7 @@ export function Chart({ data, config }: ChartProps) {
             notMerge={true}
             lazyUpdate={true}
             theme="dark"
-            style={{ height: "100% !important" }}
+            style={{ height: "100% !important", width: width ? `${width}px` : "100% !important" }}
             className="h-full w-full overflow-hidden rounded-lg"
         />
     );

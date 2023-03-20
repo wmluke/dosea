@@ -6,9 +6,9 @@ import { Link, Outlet, useLoaderData } from "@remix-run/react";
 import type { ActionArgs } from "@remix-run/server-runtime";
 import { QueryForm } from "~/components/query-form";
 import { SectionDropdown } from "~/components/section-dropdown";
+import { loadQuery, runQueryCache } from "~/lib/query.cache";
 import { saveQuery } from "~/models/query.server";
 import { loadDataset } from "~/routes/workspace.$workspaceId.dataset.$datasetId";
-import { loadQuery } from "~/routes/workspace.$workspaceId.dataset.$datasetId.explore.$queryId";
 
 export async function loader({ params }: LoaderArgs) {
     const { workspaceId, datasetId, queryId, chartId } = params;
@@ -32,6 +32,7 @@ export async function action({ params, request }: ActionArgs) {
         query: q,
         datasetId: datasetId!
     });
+    runQueryCache.delete([queryId, datasetId].join("::"));
     return redirect(`/workspace/${workspaceId}/dataset/${datasetId}/explore/${query.id}`);
 }
 

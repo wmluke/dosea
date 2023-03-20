@@ -1,7 +1,7 @@
 import type { LoaderArgs } from "@remix-run/node";
 import { redirect } from "@remix-run/node";
+import { loadQuery } from "~/lib/query.cache";
 import { deleteQuery } from "~/models/query.server";
-import { loadQuery } from "~/routes/workspace.$workspaceId.dataset.$datasetId.explore.$queryId";
 
 
 export async function loader({ params }: LoaderArgs) {
