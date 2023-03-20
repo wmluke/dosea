@@ -1,5 +1,6 @@
 {
   "name": "dosea-7b28",
+  "license": "AGPLv3",
   "private": true,
   "sideEffects": false,
   "scripts": {

@@ -42,3 +42,8 @@ npm run start
 * Rich chart editor
 * Embeddable charts via web components
 * Scheduled PDF and email reports
+
+## License
+
+Plausible is open-source under the GNU Affero General Public License Version 3 (AGPLv3) or any later version. You
+can [find it here](https://github.com/wmluke/dosea/blob/main/LICENSE.md).
