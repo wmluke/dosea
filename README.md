@@ -38,10 +38,13 @@ npm run start
 * Support for postgres, mysql
 * Support for influx, prometheus
 * Dashboards
+* Themes
 * Rich SQL editor with code completion & time range & delta utilities
 * Rich chart editor
+* Stock chart templates for common use-cases
 * Embeddable charts via web components
 * Scheduled PDF and email reports
+* Explore AI integrations to generate queries and charts based on user prompts
 
 ## License
 
