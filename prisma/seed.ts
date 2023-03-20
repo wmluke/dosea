@@ -1,11 +1,17 @@
-import {PrismaClient} from '@prisma/client';
-import {createWorkspace} from '~/models/workspace.server';
+import { PrismaClient } from "@prisma/client";
+import { createWorkspace, getWorkspaces } from "~/models/workspace.server";
 
 const prisma = new PrismaClient();
 
 async function seed() {
-    await createWorkspace({name: 'Default Workspace'});
 
+    const workspaces = await getWorkspaces();
+    if (workspaces && workspaces.length > 0) {
+        console.log(`Database was already seeded.`);
+        return;
+    }
+
+    await createWorkspace({ name: "Default Workspace" });
     console.log(`Database has been seeded. 🌱`);
 }
 
