@@ -173,10 +173,31 @@ export class SqliteDatabase implements DB {
     }
 }
 
-export function connect(url: string, type: string): Promise<DB> {
+declare global {
+    var __dbs__: Map<string, DB>;
+}
+
+let dbs: Map<string, DB>;
+
+if (process.env.NODE_ENV === "production") {
+    dbs = new Map<string, DB>();
+} else {
+    if (!global.__dbs__) {
+        global.__dbs__ = new Map<string, DB>();
+    }
+    dbs = global.__dbs__;
+}
+
+
+export async function connect(url: string, type: string): Promise<DB> {
+    const key = `${type}::${url}`;
     switch (type) {
         case "sqlite":
-            return new SqliteConnection(url).connect();
+            if (!dbs.has(key)) {
+                const db = await new SqliteConnection(url).connect();
+                dbs.set(key, db);
+            }
+            return dbs.get(key)!;
         default:
             throw "Unsupported dataset type";
     }

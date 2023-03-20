@@ -111,8 +111,6 @@ export async function runQueryDangerouslyAndUnsafe<T = ChartData>(query: QueryWi
         console.warn("Dataset Explorer Query Error");
         console.warn(e);
         return { error: err(e) };
-    } finally {
-        await db.close();
     }
 }
 
