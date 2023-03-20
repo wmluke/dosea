@@ -15,7 +15,7 @@ export default function _index() {
             <div className="hero-content text-center">
                 <div className="max-w-md">
                     <h1 className="text-5xl font-bold"><span className="text-orange-600">Dosea</span></h1>
-                    <p className="py-6">A dosea (doh-see-ay) for your datasets</p>
+                    <p className="py-6">A dosea (daw-see-ey) for your datasets</p>
                     <p className="py-6">Pick a workspace to get started.</p>
                     <ul className="list-none">
 
