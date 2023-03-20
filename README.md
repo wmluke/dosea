@@ -1,6 +1,6 @@
 # Dosea
 
-> A dosea (doh-see-yay) for your datasets
+> A dosea (doh-see-ay) for your datasets
 
 ![Query with Chart](public/screenshot.w1000.png)
 
