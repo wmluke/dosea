@@ -116,8 +116,8 @@ export type ConvertDatesToStrings<T> = T extends Date
  * pull out the creds from the full url.
  * See https://bugs.chromium.org/p/chromium/issues/detail?id=869291
  */
-export function sanitizeConnectionUrl(connection: string) {
-    if (connection.includes("@")) {
+export function sanitizeConnectionUrl(connection?: string) {
+    if (connection && connection.includes("@")) {
         const proto = connection.split(":").shift();
         const rhs = connection.split("@").pop();
         return `${proto}://${rhs}`;

@@ -1,22 +1,14 @@
 import { MagnifyingGlassIcon } from "@heroicons/react/24/solid";
 import type { Dataset, DatasetQuery } from "@prisma/client";
-import type { LoaderArgs } from "@remix-run/node";
-import { json, redirect } from "@remix-run/node";
-import { Link, Outlet, useLoaderData } from "@remix-run/react";
+import { redirect } from "@remix-run/node";
+import { Link, Outlet } from "@remix-run/react";
 import type { ActionArgs } from "@remix-run/server-runtime";
 import { QueryForm } from "~/components/query-form";
 import { SectionDropdown } from "~/components/section-dropdown";
-import { loadQuery, runQueryCache } from "~/lib/query.cache";
+import { runQueryCache } from "~/lib/query.cache";
 import { saveQuery } from "~/models/query.server";
+import { useWorkspaceContext } from "~/routes/workspace.$workspaceId";
 import { loadDataset } from "~/routes/workspace.$workspaceId.dataset.$datasetId";
-
-export async function loader({ params }: LoaderArgs) {
-    const { workspaceId, datasetId, queryId, chartId } = params;
-    const dataset = await loadDataset(datasetId, workspaceId);
-    const query = await loadQuery({ queryId, datasetId });
-
-    return json({ dataset, query, chartId });
-}
 
 export async function action({ params, request }: ActionArgs) {
     const { workspaceId, datasetId } = params;
@@ -37,14 +29,13 @@ export async function action({ params, request }: ActionArgs) {
 }
 
 export default function DatasetExplorePage() {
-    const data = useLoaderData<typeof loader>();
-    const dataset = data.dataset;
-    const query = data.query;
+    const { dataset, query } = useWorkspaceContext();
+
     const deleteUrl = [
         "/workspace",
-        dataset.workspaceId,
+        dataset?.workspaceId,
         "dataset",
-        dataset.id,
+        dataset?.id,
         "explore",
         query?.id,
         "delete"

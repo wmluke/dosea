@@ -1,16 +1,12 @@
-import type { LoaderArgs } from "@remix-run/node";
-import { json } from "@remix-run/node";
-import { useLoaderData } from "@remix-run/react";
 import { DatasetForm } from "~/components/dataset-form";
-import { loadDataset } from "~/routes/workspace.$workspaceId.dataset.$datasetId";
-
-export async function loader({ params }: LoaderArgs) {
-    const { workspaceId, datasetId } = params;
-    const dataset = await loadDataset(datasetId, workspaceId);
-    return json(dataset);
-}
+import { useWorkspaceContext } from "~/routes/workspace.$workspaceId";
 
 export default function DatasetEditPage() {
-    const { id, workspaceId, type, name, connection } = useLoaderData<typeof loader>();
-    return <DatasetForm id={id} workspaceId={workspaceId!} name={name} type={type} connection={connection} />;
+    const { dataset } = useWorkspaceContext();
+
+    return <DatasetForm id={dataset?.id}
+                        workspaceId={dataset?.workspaceId!}
+                        name={dataset?.name}
+                        type={dataset?.type}
+                        connection={dataset?.connection} />;
 }

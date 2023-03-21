@@ -1,7 +1,7 @@
 import { ChartPieIcon } from "@heroicons/react/24/solid";
 import type { LoaderArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
-import { Link, useLoaderData } from "@remix-run/react";
+import { Link, useLoaderData, useRouteLoaderData } from "@remix-run/react";
 import { ChartsGrid } from "~/components/charts-grid";
 import { SectionDropdown } from "~/components/section-dropdown";
 import type { QueryError } from "~/lib/query.cache";
@@ -53,4 +53,8 @@ export default function QueryPage() {
             <ChartsGrid charts={query?.charts ?? []} queryResult={data.queryResult?.result} />
         </section>
     );
+}
+
+export function useQueryPageLoaderData(): QueryPageLoaderReturn {
+    return useRouteLoaderData("routes/workspace.$workspaceId.dataset.$datasetId.explore.$queryId") as QueryPageLoaderReturn;
 }

@@ -1,11 +1,12 @@
-import type { Workspace } from "@prisma/client";
-import { useRouteLoaderData } from "react-router";
 import { DatasetForm } from "~/components/dataset-form";
-
-type WorkspaceLoader = { workspace: Workspace };
+import { useWorkspaceContext } from "~/routes/workspace.$workspaceId";
+import { notFound } from "~/utils";
 
 export default function DatasetAddPage() {
-    const { workspace } = useRouteLoaderData("routes/workspace.$workspaceId") as WorkspaceLoader;
+    const { workspace } = useWorkspaceContext();
+    if (!workspace) {
+        throw notFound();
+    }
 
     return <DatasetForm workspaceId={workspace.id} />;
 }

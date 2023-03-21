@@ -24,7 +24,7 @@ export function LeftNav({ workspace, dataset }: LeftNavProps) {
                     <li key={ds.id}>
                         <NavLink
                             reloadDocument
-                            to={`/workspace/${workspace.id}/dataset/${ds.id}/explore`}
+                            to={`/workspace/${workspace.id}/dataset/${ds.id}`}
                             className={({ isActive }) => classNames(isActive ? "active" : "", "gap")}
                         >
                             <CircleStackIcon className="h-6 w-6"></CircleStackIcon>

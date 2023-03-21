@@ -30,6 +30,8 @@ describe("sanitizeConnectionUrl", () => {
             .toBe("/data/sample.db");
         expect(sanitizeConnectionUrl("file:///data/sample.db"))
             .toBe("file:///data/sample.db");
+        expect(sanitizeConnectionUrl(undefined))
+            .toBeUndefined();
 
     });
 });
