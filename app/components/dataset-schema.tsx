@@ -1,4 +1,4 @@
-import type { Table } from "~/lib/connector/sqlite";
+import { Table } from "~/lib/connector/connection.server";
 
 export interface DatasetSchemaProps {
     tables?: Table[];

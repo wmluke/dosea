@@ -26,6 +26,7 @@ export function DatasetForm(dataset: Partial<DatasetInput> & { workspaceId: stri
                     <select id="select-for-dataset-type" name="type" defaultValue={dataset.type}
                             className="select-bordered select w-full max-w-xs">
                         <option value="sqlite">Sqlite</option>
+                        <option value="postgres">Postgres</option>
                     </select>
                 </div>
                 <div className="form-control">

@@ -1,8 +1,8 @@
 import type { ChartData } from "~/components/chart";
 import { DatasetSchema } from "~/components/dataset-schema";
 import { QueryResultsInspector } from "~/components/query-results-inspector";
-import type { Table } from "~/lib/connector/sqlite";
-import { QueryError } from "~/lib/query.cache";
+import type { Table } from "~/lib/connector/connection.server";
+import type { QueryError } from "~/lib/query.cache";
 
 export interface RightPaneProps<T = ChartData> {
     queryResult?: T | null;

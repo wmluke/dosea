@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import type { SqliteDatabase } from "~/lib/connector/sqlite";
-import { SqliteConnection } from "~/lib/connector/sqlite";
+import type { SqliteDatabase } from "~/lib/connector/sqlite.server";
+import { SqliteConnection } from "~/lib/connector/sqlite.server";
 
 describe("SqliteDatabase", () => {
 

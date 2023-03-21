@@ -37,6 +37,8 @@ npm run start
 * User Authentication
 * Support for postgres, mysql
 * Support for influx, prometheus
+* Support for CSV, JSON, XML, YAML
+* Support for Google Sheets, Excel
 * Dashboards
 * Themes
 * Rich SQL editor with code completion & time range & delta utilities

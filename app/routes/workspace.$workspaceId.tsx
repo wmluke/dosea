@@ -4,7 +4,7 @@ import { Outlet, useLoaderData } from "@remix-run/react";
 import { useRouteLoaderData } from "react-router";
 import { LeftNav } from "~/components/left-nav";
 import { RightPane } from "~/components/right-pane";
-import type { Table } from "~/lib/connector/sqlite";
+import { Table } from "~/lib/connector/connection.server";
 import type { DatasetWithQueries } from "~/models/dataset.server";
 import { getDatasetById } from "~/models/dataset.server";
 import type { WorkspaceWithDatasets } from "~/models/workspace.server";

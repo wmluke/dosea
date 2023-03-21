@@ -4,7 +4,7 @@ import type { LoaderArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { Link, Outlet, useLoaderData } from "@remix-run/react";
 import { SectionDropdown } from "~/components/section-dropdown";
-import { connect } from "~/lib/connector/sqlite";
+import { connect } from "~/lib/connector/connection.server";
 import { getDatasetById } from "~/models/dataset.server";
 import { badRequest, notFound } from "~/utils";
 
@@ -33,6 +33,15 @@ export async function loader({ params }: LoaderArgs) {
     return json({ dataset });
 }
 
+function sanitizeConnectionUrl(connection: string) {
+    try {
+        const url = new URL(connection);
+        return connection.replace(`${url.username}:${url.password}@`, "");
+    } catch (e) {
+        return connection;
+    }
+}
+
 export default function DatasetPage() {
     const { dataset } = useLoaderData<typeof loader>();
 
@@ -58,7 +67,7 @@ export default function DatasetPage() {
                     </SectionDropdown>
                 </div>
                 <code className="mx-0 px-0">
-                    {dataset.type} {dataset.connection}
+                    {dataset.type} {sanitizeConnectionUrl(dataset.connection)}
                 </code>
             </section>
 

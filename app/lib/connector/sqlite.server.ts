@@ -1,5 +1,6 @@
 import Database from "better-sqlite3";
 import * as os from "os";
+import type { ConnectionOptions, ConnectionServer, DB, Table } from "~/lib/connector/connection.server";
 
 function isMacOS(): boolean {
     return os.platform().toLowerCase().includes("darwin");
@@ -35,48 +36,6 @@ function getDist(): string | undefined {
     return;
 }
 
-const getExtension = (): string | undefined => {
-    if (isWindows()) {
-        return "dll";
-    }
-    if (isLinux()) {
-        return "so";
-    }
-    if (isMacOS()) {
-        return "dylib";
-    }
-    return;
-};
-
-
-export interface ConnectionOptions {
-    readonly?: boolean;
-}
-
-export interface Connection {
-    connect(opts?: ConnectionOptions): Promise<DB>;
-}
-
-export interface Column {
-    name: string;
-    type: string;
-}
-
-export interface Table {
-    name: string;
-    columns: Column[];
-}
-
-export interface DB {
-    close(): Promise<void>;
-
-    getTables(): Promise<Table[]>;
-
-    query(sql: string): Promise<any>;
-
-    exec(sql: string): Promise<any>;
-}
-
 /**
  * https://github.com/nalgeon/sqlean
  */
@@ -96,7 +55,7 @@ const sqleanExtensions = [
     "vsv"
 ];
 
-export class SqliteConnection implements Connection {
+export class SqliteConnection implements ConnectionServer {
     constructor(private readonly url: string) {
     }
 
@@ -173,32 +132,4 @@ export class SqliteDatabase implements DB {
     }
 }
 
-declare global {
-    var __dbs__: Map<string, DB>;
-}
 
-let dbs: Map<string, DB>;
-
-if (process.env.NODE_ENV === "production") {
-    dbs = new Map<string, DB>();
-} else {
-    if (!global.__dbs__) {
-        global.__dbs__ = new Map<string, DB>();
-    }
-    dbs = global.__dbs__;
-}
-
-
-export async function connect(url: string, type: string): Promise<DB> {
-    const key = `${type}::${url}`;
-    switch (type) {
-        case "sqlite":
-            if (!dbs.has(key)) {
-                const db = await new SqliteConnection(url).connect();
-                dbs.set(key, db);
-            }
-            return dbs.get(key)!;
-        default:
-            throw "Unsupported dataset type";
-    }
-}
