@@ -1,10 +1,11 @@
+import { Bars3Icon } from "@heroicons/react/24/solid";
 import type { LoaderArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { Outlet, useLoaderData } from "@remix-run/react";
 import { useRouteLoaderData } from "react-router";
 import { LeftNav } from "~/components/left-nav";
 import { RightPane } from "~/components/right-pane";
-import { Table } from "~/lib/connector/connection.server";
+import type { Table } from "~/lib/connector/connection.server";
 import type { DatasetWithQueries } from "~/models/dataset.server";
 import { getDatasetById } from "~/models/dataset.server";
 import type { WorkspaceWithDatasets } from "~/models/workspace.server";
@@ -51,27 +52,15 @@ export default function WorkspacePage() {
 
     return (
         <div className="drawer-mobile drawer">
-            <input id="my-drawer-2" type="checkbox" className="drawer-toggle" />
+            <input id="main-drawer" type="checkbox" className="drawer-toggle" />
             <div
                 className="drawer-content flex flex-col"
                 style={{ scrollBehavior: "smooth", scrollPaddingTop: "5rem" }}
             >
                 <div className="navbar bg-base-100 lg:hidden">
                     <div className="flex-none lg:hidden">
-                        <label htmlFor="my-drawer-2" className="btn-ghost btn-square btn">
-                            <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                className="inline-block h-6 w-6 stroke-current"
-                            >
-                                <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth="2"
-                                    d="M4 6h16M4 12h16M4 18h16"
-                                ></path>
-                            </svg>
+                        <label htmlFor="main-drawer" className="btn-ghost btn-square btn">
+                            <Bars3Icon className="inline-block h-6 w-6 stroke-current" />
                         </label>
                     </div>
                     <div className="mx-2 flex-1 px-2 text-3xl lg:hidden">{workspace?.name}</div>
@@ -81,7 +70,7 @@ export default function WorkspacePage() {
                     <div className="grow basis-4/5">
                         <Outlet></Outlet>
                     </div>
-                    <div className="prose grow-0 basis-1/5">
+                    <div className="prose grow-0 basis-1/5 hidden sm:block">
                         <RightPane
                             queryResult={queryLoaderData?.queryResult?.result}
                             queryError={queryLoaderData?.queryResult?.error}
@@ -91,7 +80,7 @@ export default function WorkspacePage() {
                 </div>
             </div>
             <div className="drawer-side" style={{ scrollBehavior: "smooth", scrollPaddingTop: "5rem" }}>
-                <label htmlFor="my-drawer-2" className="drawer-overlay"></label>
+                <label htmlFor="main-drawer" className="drawer-overlay"></label>
                 <LeftNav workspace={workspace} dataset={dataset} />
             </div>
         </div>
