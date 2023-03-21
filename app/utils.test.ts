@@ -24,6 +24,10 @@ describe("sanitizeConnectionUrl", () => {
     it("should remove credentials from connection string ", () => {
         expect(sanitizeConnectionUrl("postgres://bob:s/ec:r@et@foo.com:5432/db"))
             .toBe("postgres://foo.com:5432/db");
+        expect(sanitizeConnectionUrl("postgres://foo.com:5432/db"))
+            .toBe("postgres://foo.com:5432/db");
+        expect(sanitizeConnectionUrl("/data/sample.db"))
+            .toBe("/data/sample.db");
 
     });
 });
