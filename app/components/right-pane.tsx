@@ -3,6 +3,7 @@ import { DatasetSchema } from "~/components/dataset-schema";
 import { QueryResultsInspector } from "~/components/query-results-inspector";
 import type { Table } from "~/lib/connector/connection.server";
 import type { QueryError } from "~/lib/query.cache";
+import { classNames } from "~/utils";
 
 export interface RightPaneProps<T = ChartData> {
     queryResult?: T | null;
@@ -11,9 +12,11 @@ export interface RightPaneProps<T = ChartData> {
 }
 
 export function RightPane({ queryResult, queryError, tables }: RightPaneProps) {
+    const emptyQueryResults = !queryResult && !queryError;
+
     return (
         <div className="flex h-[150vh] flex-col">
-            <div className="block h-[75vh] overflow-hidden">
+            <div className={classNames("block h-[75vh] overflow-hidden", emptyQueryResults ? "hidden" : "")}>
                 <h3 className="prose">Query Results</h3>
                 <QueryResultsInspector
                     className="h-full w-[300px] overflow-hidden overflow-y-auto overflow-x-auto text-sm"
