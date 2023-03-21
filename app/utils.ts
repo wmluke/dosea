@@ -110,3 +110,13 @@ export type ConvertDatesToStrings<T> = T extends Date
         : T extends object
             ? { [K in keyof T]: ConvertDatesToStrings<T[K]> }
             : T;
+
+/**
+ * `URL` in chrome has issues with non-standard protocols, so need to manually
+ * pull out the creds from the full url.
+ */
+export function sanitizeConnectionUrl(connection: string) {
+    const proto = connection.split(":").shift();
+    const rhs = connection.split("@").pop();
+    return `${proto}://${rhs}`;
+}

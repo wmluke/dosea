@@ -6,7 +6,7 @@ import { Link, Outlet, useLoaderData } from "@remix-run/react";
 import { SectionDropdown } from "~/components/section-dropdown";
 import { connect } from "~/lib/connector/connection.server";
 import { getDatasetById } from "~/models/dataset.server";
-import { badRequest, notFound } from "~/utils";
+import { badRequest, notFound, sanitizeConnectionUrl } from "~/utils";
 
 export async function loadDataset(datasetId?: string, workspaceId?: string) {
     if (!datasetId) {
@@ -31,15 +31,6 @@ export async function loader({ params }: LoaderArgs) {
     const { workspaceId, datasetId } = params;
     const dataset = await loadDataset(datasetId, workspaceId);
     return json({ dataset });
-}
-
-function sanitizeConnectionUrl(connection: string) {
-    try {
-        const url = new URL(connection);
-        return connection.replace(`${url.username}:${url.password}@`, "");
-    } catch (e) {
-        return connection;
-    }
 }
 
 export default function DatasetPage() {

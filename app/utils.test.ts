@@ -1,5 +1,5 @@
 import { describe, expect, test } from "vitest";
-import { isEmpty } from "~/utils";
+import { isEmpty, sanitizeConnectionUrl } from "~/utils";
 
 
 describe("isEmpty", () => {
@@ -16,6 +16,15 @@ describe("isEmpty", () => {
         expect(isEmpty([1])).toBe(false);
         expect(isEmpty("a")).toBe(false);
         expect(isEmpty(" ")).toBe(false);
+    });
+});
+
+describe("sanitizeConnectionUrl", () => {
+
+    it("should remove credentials from connection string ", () => {
+        expect(sanitizeConnectionUrl("postgres://bob:s/ec:r@et@foo.com:5432/db"))
+            .toBe("postgres://foo.com:5432/db");
+
     });
 });
 
