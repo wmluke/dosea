@@ -28,6 +28,8 @@ describe("sanitizeConnectionUrl", () => {
             .toBe("postgres://foo.com:5432/db");
         expect(sanitizeConnectionUrl("/data/sample.db"))
             .toBe("/data/sample.db");
+        expect(sanitizeConnectionUrl("file:///data/sample.db"))
+            .toBe("file:///data/sample.db");
 
     });
 });

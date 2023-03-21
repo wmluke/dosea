@@ -114,6 +114,7 @@ export type ConvertDatesToStrings<T> = T extends Date
 /**
  * `URL` in chrome has issues with non-standard protocols, so need to manually
  * pull out the creds from the full url.
+ * See https://bugs.chromium.org/p/chromium/issues/detail?id=869291
  */
 export function sanitizeConnectionUrl(connection: string) {
     if (connection.includes("@")) {
