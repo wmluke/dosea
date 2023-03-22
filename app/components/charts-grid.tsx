@@ -47,13 +47,6 @@ export function ChartsGrid({ charts, queryResult }: ChartsGridProps) {
                                 Edit
                             </Link>
                             <Link
-                                reloadDocument
-                                to={joinTruthy(["chart", chart!.id], "/")}
-                                className="btn-secondary btn-xs btn"
-                            >
-                                Add to Dashboard
-                            </Link>
-                            <Link
                                 to={joinTruthy(["chart", chart!.id, "delete"], "/")}
                                 className="btn-info btn-xs btn"
                             >
