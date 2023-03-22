@@ -3,7 +3,6 @@ import type { Dataset } from "@prisma/client";
 import type { LoaderArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { Link, Outlet, useLoaderData } from "@remix-run/react";
-import { DatasetQueryNav } from "~/components/dataset-query-nav";
 import { RightPane } from "~/components/right-pane";
 import { SecondaryDrawer } from "~/components/secondary-drawer";
 import { SectionDropdown } from "~/components/section-dropdown";
@@ -57,6 +56,10 @@ export function ErrorBoundary({ error }: { error: Error }) {
     );
 }
 
+export const handle = {
+    primaryDrawerOpen: true
+};
+
 export default function DatasetPage() {
     const { tables } = useLoaderData<typeof loader>();
 
@@ -74,7 +77,9 @@ export default function DatasetPage() {
                                 <Bars3Icon className="inline-block h-6 w-6 stroke-current" />
                             </label>
                         </div>
-                        <div className="mx-2 flex-1 px-2 text-3xl lg:hidden">{workspace?.name}</div>
+                        <div className="mx-2 flex-1 px-2 text-3xl lg:hidden">
+                            <Link to={`/workspace/${workspace?.id}`} reloadDocument>{workspace?.name}</Link>
+                        </div>
                         <div className="flex-none">
                             <div className="flex-none lg:hidden">
                                 <label htmlFor="secondary-drawer" className="btn-ghost btn-square btn">
@@ -108,14 +113,6 @@ export default function DatasetPage() {
                                     {dataset?.type} {sanitizeConnectionUrl(dataset?.connection)}
                                 </code>
                             </section>
-                            {!query ?
-                                <section>
-                                    <ul className="menu menu-compact">
-                                        <DatasetQueryNav dataset={dataset} />
-                                    </ul>
-                                </section>
-                                : ""
-                            }
                             <Outlet context={{ workspace, dataset, query }} />
                         </div>
                     </div>

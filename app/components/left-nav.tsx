@@ -1,5 +1,5 @@
 import { CircleStackIcon, PlusCircleIcon } from "@heroicons/react/24/solid";
-import { NavLink } from "@remix-run/react";
+import { Link, NavLink } from "@remix-run/react";
 import { DatasetQueryNav } from "~/components/dataset-query-nav";
 import type { DatasetWithQueries } from "~/models/dataset.server";
 import type { WorkspaceWithDatasets } from "~/models/workspace.server";
@@ -14,7 +14,9 @@ export function LeftNav({ workspace, dataset }: LeftNavProps) {
     return (
         <ul className="menu menu menu-compact flex w-80 flex-col bg-base-200 p-0 px-4 text-base-content">
             <li>
-                <div className="mx-2 flex-1 px-2 text-3xl">{workspace?.name}</div>
+                <div className="mx-2 flex-1 px-2 text-3xl">
+                    <Link to={`/workspace/${workspace?.id}`} reloadDocument>{workspace?.name}</Link>
+                </div>
             </li>
             <li className="menu-title">
                 <span className="text-xl">Datasets</span>

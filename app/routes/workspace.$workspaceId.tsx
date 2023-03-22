@@ -1,6 +1,6 @@
 import type { LoaderArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
-import { Outlet, useLoaderData, useOutletContext } from "@remix-run/react";
+import { Outlet, useLoaderData, useMatches, useOutletContext } from "@remix-run/react";
 import { LeftNav } from "~/components/left-nav";
 import { PrimaryDrawer } from "~/components/primary-drawer";
 import type { DatasetWithQueries } from "~/models/dataset.server";
@@ -36,11 +36,19 @@ export async function loader({ params }: LoaderArgs) {
     return json(context);
 }
 
+export const handle = {
+    primaryDrawerOpen: true
+};
+
 export default function WorkspacePage() {
     const { workspace, dataset, query } = useLoaderData<typeof loader>() as WorkspaceContext;
 
+    const match = useMatches().pop();
+    const openDrawer = match?.handle?.primaryDrawerOpen ?? false;
+
     return (
         <PrimaryDrawer
+            open={openDrawer}
             drawerSideContent={
                 <LeftNav key="LeftNav" workspace={workspace} dataset={dataset} />
             }

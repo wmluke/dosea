@@ -4,7 +4,7 @@ import type { DatasetInput } from "~/models/dataset.server";
 export function DatasetForm(dataset: Partial<DatasetInput> & { workspaceId: string }) {
 
     return (
-        <div className="prose">
+        <div className="prose m-4">
             <h1 className="text-3xl">
                 {dataset.id ? "Edit Dataset" : "Add Dataset"}
             </h1>

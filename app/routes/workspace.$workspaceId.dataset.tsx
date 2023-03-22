@@ -46,6 +46,10 @@ export async function action({ request, params }: ActionArgs) {
     return redirect(`/workspace/${workspace.id}/dataset/${dataset.id}/query`);
 }
 
+export const handle = {
+    primaryDrawerOpen: true
+};
+
 export default function() {
     const { workspace, dataset, query } = useWorkspaceContext();
     return (
