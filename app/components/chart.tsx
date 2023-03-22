@@ -10,6 +10,8 @@ import type {
     TitleComponentOption,
     TooltipComponentOption
 } from "echarts/components";
+import { useEffect } from "react";
+import { clearTimeout } from "timers";
 
 export type ECOption = echarts.ComposeOption<
     | BarSeriesOption
@@ -39,9 +41,26 @@ export function Chart({ data, config, width }: ChartProps) {
         },
         ...(config ?? {})
     };
+    let echartRef: ReactEChartsCore | null = null;
+
+    // kind of lame, but need to resize chart for proper
+    // sizing in inside grid react-grid-layout.
+    // will likely need to revisit this
+    useEffect(() => {
+        const timeout = setTimeout(() => {
+            echartRef?.getEchartsInstance().resize();
+        });
+        return () => {
+            clearTimeout(timeout);
+        };
+    });
+
     return (
         <ReactEChartsCore
             echarts={echarts}
+            ref={(e) => {
+                echartRef = e;
+            }}
             option={chartOptions}
             notMerge={true}
             lazyUpdate={true}

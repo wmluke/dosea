@@ -36,6 +36,7 @@ export function ChartsGrid({ charts, queryResult }: ChartsGridProps) {
                     data-grid={gridItemLayout(i)}
                 >
                     <div className="card-body">
+
                         <Chart data={queryResult ?? []} config={JSON.parse(chart!.configJson)} />
                         <div className="card-actions justify-end">
                             <Link
@@ -44,6 +45,13 @@ export function ChartsGrid({ charts, queryResult }: ChartsGridProps) {
                                 className="btn-secondary btn-xs btn"
                             >
                                 Edit
+                            </Link>
+                            <Link
+                                reloadDocument
+                                to={joinTruthy(["chart", chart!.id], "/")}
+                                className="btn-secondary btn-xs btn"
+                            >
+                                Add to Dashboard
                             </Link>
                             <Link
                                 to={joinTruthy(["chart", chart!.id, "delete"], "/")}
