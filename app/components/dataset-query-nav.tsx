@@ -18,7 +18,7 @@ export function DatasetQueryNav({ dataset }: DatasetQueryNavProps) {
                 return (
                     <li key={q.id}>
                         <NavLink
-                            to={`/workspace/${dataset.workspaceId}/dataset/${dataset.id}/explore/${q.id}`}
+                            to={`/workspace/${dataset.workspaceId}/dataset/${dataset.id}/query/${q.id}`}
                             reloadDocument={true}
                             className="no-underline"
                         >
@@ -30,7 +30,7 @@ export function DatasetQueryNav({ dataset }: DatasetQueryNavProps) {
             })}
             <li>
                 <NavLink
-                    to={`/workspace/${dataset?.workspaceId}/dataset/${dataset?.id}/explore`}
+                    to={`/workspace/${dataset?.workspaceId}/dataset/${dataset?.id}/query`}
                     reloadDocument={true}
                     className={classNames("no-underline", dataset?.id ? null : "hidden")}
                     end

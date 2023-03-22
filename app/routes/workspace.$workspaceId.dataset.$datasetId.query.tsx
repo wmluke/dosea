@@ -25,7 +25,7 @@ export async function action({ params, request }: ActionArgs) {
         datasetId: datasetId!
     });
     runQueryCache.delete([queryId, datasetId].join("::"));
-    return redirect(`/workspace/${workspaceId}/dataset/${datasetId}/explore/${query.id}`);
+    return redirect(`/workspace/${workspaceId}/dataset/${datasetId}/query/${query.id}`);
 }
 
 export default function DatasetExplorePage() {
@@ -36,7 +36,7 @@ export default function DatasetExplorePage() {
         dataset?.workspaceId,
         "dataset",
         dataset?.id,
-        "explore",
+        "query",
         query?.id,
         "delete"
     ].join("/");

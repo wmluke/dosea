@@ -43,7 +43,7 @@ export async function action({ request, params }: ActionArgs) {
         workspaceId
     });
 
-    return redirect(`/workspace/${workspace.id}/dataset/${dataset.id}/explore`);
+    return redirect(`/workspace/${workspace.id}/dataset/${dataset.id}/query`);
 }
 
 export default function() {

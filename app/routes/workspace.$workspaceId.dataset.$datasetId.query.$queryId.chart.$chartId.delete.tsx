@@ -14,5 +14,5 @@ export async function loader({ params }: LoaderArgs) {
     }
     await deleteChartConfig(chartConfig.id);
 
-    return redirect(joinTruthy(["/workspace", workspaceId, "dataset", datasetId, "explore", queryId], "/"));
+    return redirect(joinTruthy(["/workspace", workspaceId, "dataset", datasetId, "query", queryId], "/"));
 }

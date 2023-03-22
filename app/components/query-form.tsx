@@ -9,7 +9,7 @@ export interface QueryFormProps {
 export function QueryForm({ dataset, query }: QueryFormProps) {
     const { id, workspaceId, type } = dataset;
     return (
-        <form method="post" action={joinTruthy(["/workspace", workspaceId, "dataset", id, "explore"], "/")}>
+        <form method="post" action={joinTruthy(["/workspace", workspaceId, "dataset", id, "query"], "/")}>
             <input type="hidden" name="queryId" value={query?.id} />
             <div className="form-control">
                 <label className="label">

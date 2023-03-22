@@ -8,5 +8,5 @@ export async function loader({ params }: LoaderArgs) {
     const { workspaceId, datasetId, queryId } = params;
     const query = await loadQuery({ queryId, datasetId });
     await deleteQuery(query!.id);
-    return redirect(["/workspace", workspaceId, "dataset", datasetId, "explore"].join("/"));
+    return redirect(["/workspace", workspaceId, "dataset", datasetId, "query"].join("/"));
 }

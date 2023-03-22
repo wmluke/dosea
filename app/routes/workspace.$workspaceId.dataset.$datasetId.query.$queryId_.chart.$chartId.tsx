@@ -7,7 +7,7 @@ import { ChartEditor } from "~/components/chart-editor";
 import { loadQuery, runQuery } from "~/lib/query.cache";
 import type { ChartWithQuery } from "~/models/chartconfig.server";
 import { getChartConfigById, saveChartConfig } from "~/models/chartconfig.server";
-import type { QueryPageLoaderReturn } from "~/routes/workspace.$workspaceId.dataset.$datasetId.explore.$queryId";
+import type { QueryPageLoaderReturn } from "~/routes/workspace.$workspaceId.dataset.$datasetId.query.$queryId";
 import { badRequest, notFound } from "~/utils";
 
 
@@ -56,7 +56,7 @@ export async function action({ params, request }: ActionArgs) {
         queryId: queryId as string,
         type: "echart"
     });
-    return redirect(`/workspace/${workspaceId}/dataset/${datasetId}/explore/${queryId}`);
+    return redirect(`/workspace/${workspaceId}/dataset/${datasetId}/query/${queryId}`);
 }
 
 function parseConfigJson(json?: string | null) {

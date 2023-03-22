@@ -31,7 +31,7 @@ export default function QueryPage() {
         query?.dataset.workspaceId,
         "dataset",
         query?.datasetId,
-        "explore",
+        "query",
         query?.id,
         "chart/add"
     ].join("/");
@@ -56,5 +56,5 @@ export default function QueryPage() {
 }
 
 export function useQueryPageLoaderData(): QueryPageLoaderReturn {
-    return useRouteLoaderData("routes/workspace.$workspaceId.dataset.$datasetId.explore.$queryId") as QueryPageLoaderReturn;
+    return useRouteLoaderData("routes/workspace.$workspaceId.dataset.$datasetId.query.$queryId") as QueryPageLoaderReturn;
 }

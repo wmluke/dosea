@@ -10,7 +10,7 @@ import { SectionDropdown } from "~/components/section-dropdown";
 import { connect } from "~/lib/connector/connection.server";
 import { getDatasetById } from "~/models/dataset.server";
 import { useWorkspaceContext } from "~/routes/workspace.$workspaceId";
-import { useQueryPageLoaderData } from "~/routes/workspace.$workspaceId.dataset.$datasetId.explore.$queryId";
+import { useQueryPageLoaderData } from "~/routes/workspace.$workspaceId.dataset.$datasetId.query.$queryId";
 import { badRequest, notFound, sanitizeConnectionUrl } from "~/utils";
 
 export async function loadDataset(datasetId?: string, workspaceId?: string) {
