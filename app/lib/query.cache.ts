@@ -100,8 +100,8 @@ export async function runQueryDangerouslyAndUnsafe<T = ChartData>(query: QueryWi
     if (!query) {
         return { error: { message: "No query" } };
     }
-    const db = await connect(query.dataset.connection, query.dataset.type);
     try {
+        const db = await connect(query.dataset.connection, query.dataset.type);
         const start = Date.now();
         const result = (await db.query(query.query)) as T;
         const duration = Date.now() - start;

@@ -7,5 +7,8 @@ export interface QueryResultsInspectorProps<T = Array<Record<string, any>>> {
 }
 
 export function QueryResultsInspector({ result, error, className }: QueryResultsInspectorProps) {
-    return <pre className={classNames("prose", className)}>{JSON.stringify(result ?? error, null, 2)}</pre>;
+    const errorClassNames = error ? "bg-error-content bg-error border-error" : "";
+    return <pre className={classNames("prose", className, errorClassNames)}>
+        {JSON.stringify(result ?? error, null, 2)}
+    </pre>;
 }
