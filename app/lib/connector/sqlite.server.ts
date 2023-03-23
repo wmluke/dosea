@@ -1,6 +1,9 @@
 import Database from "better-sqlite3";
+import { minimatch } from "minimatch";
 import * as os from "os";
-import type { Connection, ConnectionOptions, DB, Table } from "~/lib/connector/connection.server";
+import path from "path";
+import type { Connection, DB, Table } from "~/lib/connector/connection.server";
+import { isEmpty } from "~/utils";
 
 function isMacOS(): boolean {
     return os.platform().toLowerCase().includes("darwin");
@@ -55,12 +58,50 @@ const sqleanExtensions = [
     "vsv"
 ];
 
+export interface SqliteConnectionOptions {
+    filePath: string;
+    allowedPaths?: string[];
+    dataDir?: string;
+    readonly?: boolean;
+}
+
+const extensions = new Set([".db", ".sqlite"]);
+
 export class SqliteConnection implements Connection {
-    constructor(private readonly url: string) {
+    constructor(private readonly options: SqliteConnectionOptions) {
     }
 
-    public connect({ readonly = true }: ConnectionOptions = {}): Promise<SqliteDatabase> {
-        const db = new Database(this.url, { readonly });
+    public normalizeAndValidate(): string {
+        const { filePath, dataDir, allowedPaths } = this.options;
+
+        if (filePath === ":memory:") {
+            return filePath;
+        }
+
+        const normalizeFilePath = path.resolve(
+            path.normalize(dataDir ?? path.resolve(process.cwd(), "data")),
+            path.normalize(filePath)
+        );
+        if (isEmpty(allowedPaths)) {
+            console.warn("WARNING: SqliteConnection allowedPaths is empty.");
+        }
+        const allowed = isEmpty(allowedPaths) || allowedPaths?.some((pattern) => {
+            return minimatch(normalizeFilePath, pattern);
+        });
+        if (!allowed) {
+            throw new Error("Invalid file location");
+        }
+        const ext = path.extname(normalizeFilePath) ?? "";
+        if (!extensions.has(ext.toLowerCase())) {
+            throw new Error(`Invalid file type ${ext}`);
+        }
+        return normalizeFilePath;
+    }
+
+    public connect(): Promise<SqliteDatabase> {
+        const filePath = this.normalizeAndValidate();
+        const { readonly = true } = this.options;
+        const db = new Database(filePath, { readonly });
         SqliteConnection.loadSqleanExtensions(db);
         return Promise.resolve(new SqliteDatabase(db));
     }
@@ -127,9 +168,6 @@ export class SqliteDatabase implements DB {
     }
 
     public exec(sql: string): Promise<any> {
-
-        console.log(sql);
-
         const r = this.db.prepare(sql).run();
         return Promise.resolve(r);
     }

@@ -7,8 +7,8 @@ describe("SqliteDatabase", () => {
     let db: SqliteDatabase;
 
     beforeEach(async () => {
-        const connection = new SqliteConnection(":memory:");
-        db = await connection.connect({ readonly: false });
+        const connection = new SqliteConnection({ filePath: ":memory:", readonly: false });
+        db = await connection.connect();
         await db.exec(`
             CREATE TABLE "Workspace"
             (
@@ -22,6 +22,85 @@ describe("SqliteDatabase", () => {
 
     afterEach(() => {
         db.close();
+    });
+
+    // WARNING: this will fail on windows due path delimiter issues
+    describe("normalizeAndValidate", () => {
+
+        it("should allow opening in-memory dbs", () => {
+            expect(new SqliteConnection({ filePath: ":memory:" })
+                .normalizeAndValidate()).toBe(":memory:");
+        });
+
+        it("should normalize relative paths from the `dataDir`", () => {
+            const dataDir = "/data";
+
+            expect(new SqliteConnection({ filePath: "./file.db" })
+                .normalizeAndValidate()).toBe(process.cwd() + "/data/file.db");
+
+            expect(new SqliteConnection({ filePath: "./file.db", dataDir })
+                .normalizeAndValidate()).toBe("/data/file.db");
+
+            expect(new SqliteConnection({ filePath: "../../../../../file.db", dataDir })
+                .normalizeAndValidate()).toBe("/file.db");
+
+            expect(new SqliteConnection({ filePath: "~/file.db", dataDir })
+                .normalizeAndValidate()).toBe("/data/~/file.db");
+
+        });
+
+        it("should normalize rooted paths", () => {
+            expect(new SqliteConnection({ filePath: "/a/b/c/file.db" })
+                .normalizeAndValidate()).toBe("/a/b/c/file.db");
+
+            expect(new SqliteConnection({ filePath: "/a/b/c/../file.db" })
+                .normalizeAndValidate()).toBe("/a/b/file.db");
+
+        });
+
+        it("should only allow files matching the allowedPath patterns", () => {
+
+            const allowedPaths = [
+                "/data/**/*.db",
+                "/abc/data/**/*.db"
+            ];
+            const dataDir = "/data";
+
+            expect(() => new SqliteConnection({ filePath: "/a/b/c/file.db", allowedPaths, dataDir })
+                .normalizeAndValidate()).toThrowError("Invalid file location");
+
+            expect(() => new SqliteConnection({ filePath: "/data/def/file.zip", allowedPaths, dataDir })
+                .normalizeAndValidate()).toThrowError("Invalid file location");
+
+
+            expect(new SqliteConnection({ filePath: "/data/def/file.db" })
+                .normalizeAndValidate()).toBe("/data/def/file.db");
+
+            expect(new SqliteConnection({ filePath: "/abc/data/xyz/file.db" })
+                .normalizeAndValidate()).toBe("/abc/data/xyz/file.db");
+        });
+
+        it("should only allow supported file extensions", () => {
+
+            const allowedPaths: string[] = [];
+            const dataDir = "/data";
+
+            expect(() => new SqliteConnection({ filePath: "file.json", allowedPaths, dataDir })
+                .normalizeAndValidate()).toThrowError("Invalid file type .json");
+
+            expect(() => new SqliteConnection({ filePath: "file.csv", allowedPaths, dataDir })
+                .normalizeAndValidate()).toThrowError("Invalid file type .csv");
+
+            expect(() => new SqliteConnection({ filePath: "file", allowedPaths, dataDir })
+                .normalizeAndValidate()).toThrowError("Invalid file type ");
+
+            expect(new SqliteConnection({ filePath: "file.db", dataDir })
+                .normalizeAndValidate()).toBe("/data/file.db");
+
+            expect(new SqliteConnection({ filePath: "file.sqlite", dataDir })
+                .normalizeAndValidate()).toBe("/data/file.sqlite");
+
+        });
     });
 
     describe("getTables", () => {
@@ -109,7 +188,7 @@ describe("SqliteDatabase", () => {
         it("should load sqlean vsv extension", async () => {
             await db.exec(`
                 create virtual table people using vsv(
-                    filename=fixtures/people.csv,
+                    filename=fixtures/people.db,
                     schema="create table people(id integer, name text, city text)",
                     columns=3,
                     affinity=integer

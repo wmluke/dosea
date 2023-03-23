@@ -1,15 +1,49 @@
 import { Pool } from "pg";
-import type { Connection, ConnectionOptions, DB, Table } from "~/lib/connector/connection.server";
+import type { Connection, DB, Table } from "~/lib/connector/connection.server";
 
+export interface PostgresConnectionOptions {
+    connectionString: string;
+    readonly?: boolean;
+}
+
+
+function createUrl(connectionString: string) {
+    try {
+        return new URL(connectionString);
+    } catch (e) {
+        throw new Error("Invalid postgres connection string");
+    }
+}
 
 export class PostgresConnection implements Connection {
 
-    constructor(private readonly url: string) {
+    constructor(private readonly options: PostgresConnectionOptions) {
     }
 
-    public async connect({ readonly = true }: ConnectionOptions = {}): Promise<DB> {
+    public normalizeAndValidate(): string {
+        const { connectionString } = this.options;
+        if (!connectionString) {
+            throw new Error("Invalid postgres connection: empty postgres connection string");
+        }
+        if (!connectionString.startsWith("postgresql://")) {
+            throw new Error("Invalid postgres connection: invalid protocol");
+        }
+        const url = createUrl(connectionString);
+        if (!url.pathname) {
+            throw new Error("Invalid postgres connection: missing database");
+        }
+        if (url.pathname.lastIndexOf("/") != 0) {
+            throw new Error("Invalid postgres connection: invalid database name");
+        }
+        return url.toString();
+
+    }
+
+    public async connect(): Promise<DB> {
+        const { readonly } = this.options;
+        const connectionString = this.normalizeAndValidate();
         const client = new Pool({
-            connectionString: this.url,
+            connectionString,
             application_name: "dosea",
             options: readonly ? "-c default_transaction_read_only=on" : undefined
         });

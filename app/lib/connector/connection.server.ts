@@ -7,7 +7,10 @@ export interface ConnectionOptions {
 }
 
 export interface Connection {
-    connect(opts?: ConnectionOptions): Promise<DB>;
+
+    normalizeAndValidate(): string;
+
+    connect(): Promise<DB>;
 }
 
 export interface Column {
@@ -44,15 +47,15 @@ if (process.env.NODE_ENV === "production") {
     _dbs = global.__dbs__;
 }
 
-function createConnection(url: string, type: string): Promise<DB> {
+function createConnection(url: string, type: string): Connection {
     const readonly = true;
     switch (type) {
         case "sqlite":
-            return new SqliteConnection(url).connect({ readonly });
+            return new SqliteConnection({ filePath: url, readonly });
         case "postgres":
-            return new PostgresConnection(url).connect({ readonly });
+            return new PostgresConnection({ connectionString: url, readonly });
         case "csv":
-            return new CsvConnection(url).connect({ readonly });
+            return new CsvConnection({ filePath: url });
         default:
             throw "Unsupported dataset type";
     }
@@ -61,7 +64,7 @@ function createConnection(url: string, type: string): Promise<DB> {
 export async function connect(url: string, type: string): Promise<DB> {
     const key = `${type}::${url}`;
     if (!_dbs.has(key)) {
-        const db = await createConnection(url, type);
+        const db = await createConnection(url, type).connect();
         _dbs.set(key, db);
     }
     return _dbs.get(key)!;
