@@ -2,7 +2,7 @@
 
 > A dosea (daw-see-ey) for your datasets
 
-![example branch parameter](https://github.com/wmluke/dosea/actions/workflows/deploy.yml/badge.svg?branch=main)
+[![🚀 Deploy](https://github.com/wmluke/dosea/actions/workflows/deploy.yml/badge.svg?branch=main)](https://github.com/wmluke/dosea/actions/workflows/deploy.yml)
 
 ![Query with Chart](public/screenshot.w1000.png)
 
