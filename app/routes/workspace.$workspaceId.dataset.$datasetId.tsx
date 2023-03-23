@@ -71,13 +71,13 @@ export default function DatasetPage() {
         <SecondaryDrawer
             drawerContent={
                 <>
-                    <div className="navbar bg-base-100 lg:hidden">
-                        <div className="flex-none lg:hidden">
+                    <div className="navbar bg-base-100 xl:hidden">
+                        <div className="flex-none xl:hidden">
                             <label htmlFor="primary-drawer" className="btn-ghost btn-square btn">
                                 <Bars3Icon className="inline-block h-6 w-6 stroke-current" />
                             </label>
                         </div>
-                        <div className="mx-2 flex-1 px-2 text-3xl lg:hidden">
+                        <div className="mx-2 flex-1 px-2 text-3xl xl:hidden">
                             <Link to={`/workspace/${workspace?.id}`} reloadDocument>{workspace?.name}</Link>
                         </div>
                         <div className="flex-none">

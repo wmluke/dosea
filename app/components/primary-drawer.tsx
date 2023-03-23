@@ -6,7 +6,7 @@ export interface PrimaryDrawerProps {
 
 export function PrimaryDrawer({ drawerContent, drawerSideContent, open = false }: PrimaryDrawerProps) {
     return (
-        <div className="drawer-mobile drawer drawer-primary">
+        <div className="drawer-tablet drawer drawer-primary">
             <input id="primary-drawer" type="checkbox" defaultChecked={open}
                    className="drawer-toggle drawer-primary-toggle" />
             <div className="drawer-content drawer-primary-content flex flex-col"

@@ -1,3 +1,65 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@media (min-width: 1280px) {
+    .drawer-tablet {
+        grid-auto-columns: max-content auto
+    }
+
+    .drawer-tablet > .drawer-toggle ~ .drawer-content {
+        height: auto
+    }
+
+    @media (min-width: 1280px) {
+        .drawer-tablet > .drawer-toggle ~ .drawer-content {
+            grid-column-start: 2
+        }
+
+        .drawer-tablet > .drawer-toggle ~ .drawer-side > .drawer-overlay {
+            visibility: visible
+        }
+
+        .drawer-tablet > .drawer-toggle ~ .drawer-side > .drawer-overlay + * {
+            --tw-translate-x: 0px;
+            transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))
+        }
+
+        .drawer-tablet.drawer-end > .drawer-toggle ~ .drawer-content {
+            grid-column-start: 1
+        }
+
+        .drawer-tablet.drawer-end > .drawer-toggle ~ .drawer-side {
+            grid-column-start: 2
+        }
+
+        .drawer-tablet.drawer-end > .drawer-toggle ~ .drawer-side > .drawer-overlay {
+            visibility: visible
+        }
+
+        .drawer-tablet.drawer-end > .drawer-toggle ~ .drawer-side > .drawer-overlay + * {
+            --tw-translate-x: 0px;
+            transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))
+        }
+    }.drawer-tablet > .drawer-toggle ~ .drawer-side {
+         overflow-y: auto
+     }
+
+    .drawer-tablet.drawer-end {
+        grid-auto-columns: auto max-content;
+        direction: ltr
+    }
+
+    .drawer-tablet.drawer-end > .drawer-toggle ~ .drawer-content {
+        height: auto
+    }
+
+    .drawer-tablet.drawer-end > .drawer-toggle ~ .drawer-side {
+        overflow-y: auto
+    }
+
+    .drawer-tablet > .drawer-toggle:checked ~ .drawer-content {
+        --tw-translate-x: 0px;
+        transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))
+    }
+}
