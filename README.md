@@ -2,9 +2,21 @@
 
 > A dosea (daw-see-ey) for your datasets
 
+![example branch parameter](https://github.com/wmluke/dosea/actions/workflows/deploy.yml/badge.svg?branch=main)
+
 ![Query with Chart](public/screenshot.w1000.png)
 
 Take a gander at the [demo](https://dosea-7b28.fly.dev/).
+
+## Features
+
+* Supports Sqlite and Postgres datasets
+* Readonly DB connections
+* Detailed query results
+* Detailed Table Schema
+* Sqlite [Sqlean extensions](https://github.com/nalgeon/sqlean) for math and stats aggregation
+* Charts powered by [Echarts](https://echarts.apache.org)
+* Fully responsive UI for mobile, tablet, and desktop
 
 ## Run it at home
 
@@ -35,7 +47,7 @@ npm run start
 ## Roadmap
 
 * User Authentication
-* Support for postgres, mysql
+* Support for mysql
 * Support for influx, prometheus
 * Support for CSV, JSON, XML, YAML
 * Support for Google Sheets, Excel
