@@ -4,10 +4,15 @@
 module.exports = {
     cacheDirectory: "./node_modules/.cache/remix",
     ignoredRouteFiles: ["**/.*", "**/*.css", "**/*.test.{js,jsx,ts,tsx}"],
-    serverDependenciesToBundle: [/^echarts.*/, /^zrender.*/],
+    serverDependenciesToBundle: [
+        /^echarts.*/,
+        /^zrender.*/,
+        "@sindresorhus/slugify",
+        "@sindresorhus/transliterate"
+    ],
     // servermoduleformat: "esm",
     future: {
         unstable_tailwind: false,
-        v2_routeConvention: true,
-    },
+        v2_routeConvention: true
+    }
 };

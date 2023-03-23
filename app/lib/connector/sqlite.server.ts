@@ -1,6 +1,6 @@
 import Database from "better-sqlite3";
 import * as os from "os";
-import type { ConnectionOptions, ConnectionServer, DB, Table } from "~/lib/connector/connection.server";
+import type { Connection, ConnectionOptions, DB, Table } from "~/lib/connector/connection.server";
 
 function isMacOS(): boolean {
     return os.platform().toLowerCase().includes("darwin");
@@ -55,7 +55,7 @@ const sqleanExtensions = [
     "vsv"
 ];
 
-export class SqliteConnection implements ConnectionServer {
+export class SqliteConnection implements Connection {
     constructor(private readonly url: string) {
     }
 
@@ -127,6 +127,9 @@ export class SqliteDatabase implements DB {
     }
 
     public exec(sql: string): Promise<any> {
+
+        console.log(sql);
+
         const r = this.db.prepare(sql).run();
         return Promise.resolve(r);
     }

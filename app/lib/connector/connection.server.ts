@@ -1,3 +1,4 @@
+import { CsvConnection } from "~/lib/connector/csv.server";
 import { PostgresConnection } from "~/lib/connector/postgres.server";
 import { SqliteConnection } from "~/lib/connector/sqlite.server";
 
@@ -5,7 +6,7 @@ export interface ConnectionOptions {
     readonly?: boolean;
 }
 
-export interface ConnectionServer {
+export interface Connection {
     connect(opts?: ConnectionOptions): Promise<DB>;
 }
 
@@ -44,11 +45,14 @@ if (process.env.NODE_ENV === "production") {
 }
 
 function createConnection(url: string, type: string): Promise<DB> {
+    const readonly = true;
     switch (type) {
         case "sqlite":
-            return new SqliteConnection(url).connect();
+            return new SqliteConnection(url).connect({ readonly });
         case "postgres":
-            return new PostgresConnection(url).connect();
+            return new PostgresConnection(url).connect({ readonly });
+        case "csv":
+            return new CsvConnection(url).connect({ readonly });
         default:
             throw "Unsupported dataset type";
     }

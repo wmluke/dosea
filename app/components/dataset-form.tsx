@@ -2,7 +2,6 @@ import type { DatasetInput } from "~/models/dataset.server";
 
 
 export function DatasetForm(dataset: Partial<DatasetInput> & { workspaceId: string }) {
-
     return (
         <div className="prose m-4">
             <h1 className="text-3xl">
@@ -27,6 +26,7 @@ export function DatasetForm(dataset: Partial<DatasetInput> & { workspaceId: stri
                             className="select-bordered select w-full max-w-xs">
                         <option value="sqlite">Sqlite</option>
                         <option value="postgres">Postgres</option>
+                        <option value="csv">CSV</option>
                     </select>
                 </div>
                 <div className="form-control">
@@ -37,7 +37,6 @@ export function DatasetForm(dataset: Partial<DatasetInput> & { workspaceId: stri
                            defaultValue={dataset.connection} placeholder="connection"
                            className="input-bordered input" />
                 </div>
-
                 <div className="form-control mt-3">
                     <button type="submit" className="btn-primary btn">
                         {dataset.id ? "Edit Dataset" : "Add Dataset"}

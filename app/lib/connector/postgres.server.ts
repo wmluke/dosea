@@ -1,8 +1,8 @@
 import { Pool } from "pg";
-import type { ConnectionOptions, ConnectionServer, DB, Table } from "~/lib/connector/connection.server";
+import type { Connection, ConnectionOptions, DB, Table } from "~/lib/connector/connection.server";
 
 
-export class PostgresConnection implements ConnectionServer {
+export class PostgresConnection implements Connection {
 
     constructor(private readonly url: string) {
     }
