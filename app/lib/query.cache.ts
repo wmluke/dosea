@@ -41,29 +41,31 @@ export { runQueryCache };
 
 function makeQueryCache() {
     return new LRUCache<string, { result?: ChartData, error?: QueryError }>({
-        max: 10,
-        ttl: NO_CACHE ? 1 : 300000, // 5 minutes
+        max: 100,
+        ttl: NO_CACHE ? 1 : (14 * 24 * 60 * 60 * 1000),
         allowStale: !NO_CACHE,
         noDeleteOnFetchRejection: true,
         maxSize: 5000,
         sizeCalculation: (entry) => {
-            if (entry.error) {
-                return Object.keys(entry.error).length;
-            }
             if (Array.isArray(entry.result)) {
                 return entry.result.length;
             }
-            return Object.keys(entry?.result as unknown as object).length;
+            return 1;
         },
-        fetchMethod: async (key: string) => {
+        fetchMethod: async (key: string, staleValue, { signal }) => {
+            if (signal.aborted) {
+                throw Error("Operation aborted");
+            }
             const [queryId, datasetId] = key.split("::");
-
             const query = await getQueryById(queryId);
+            if (signal.aborted) {
+                throw Error("Operation aborted");
+            }
             if (!query) {
-                return;
+                throw Error("Not Found: query");
             }
             if (datasetId && datasetId !== query.datasetId) {
-                return;
+                throw Error("Not Found: query");
             }
             return runQueryDangerouslyAndUnsafe<ChartData>(query);
         }
