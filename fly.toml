@@ -48,3 +48,6 @@ grace_period = "1s"
 interval = "15s"
 restart_limit = 0
 timeout = "2s"
+
+[env]
+DOSEA_DATA_DIR = "/data/datasets"

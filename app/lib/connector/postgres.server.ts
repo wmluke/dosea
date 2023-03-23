@@ -25,7 +25,7 @@ export class PostgresConnection implements Connection {
         if (!connectionString) {
             throw new Error("Invalid postgres connection: empty postgres connection string");
         }
-        if (!connectionString.startsWith("postgresql://")) {
+        if (!(connectionString.startsWith("postgres://") || connectionString.startsWith("postgresql://"))) {
             throw new Error("Invalid postgres connection: invalid protocol");
         }
         const url = createUrl(connectionString);

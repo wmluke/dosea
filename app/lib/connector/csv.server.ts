@@ -70,7 +70,8 @@ export class CsvConnection implements Connection {
             lowercase: true
         });
 
-        await db.exec(generateCreateVSVTable({ name, filePath, separator }));
+        const sql = generateCreateVSVTable({ name, filePath, separator });
+        await db.exec(sql);
         return Promise.resolve(new CsvDatabase(db));
     }
 }

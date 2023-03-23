@@ -73,6 +73,9 @@ describe("SqliteDatabase", () => {
                 .normalizeAndValidate()).toThrowError("Invalid file location");
 
 
+            expect(new SqliteConnection({ filePath: "/data/file.db" })
+                .normalizeAndValidate()).toBe("/data/file.db");
+
             expect(new SqliteConnection({ filePath: "/data/def/file.db" })
                 .normalizeAndValidate()).toBe("/data/def/file.db");
 
@@ -188,7 +191,7 @@ describe("SqliteDatabase", () => {
         it("should load sqlean vsv extension", async () => {
             await db.exec(`
                 create virtual table people using vsv(
-                    filename=fixtures/people.db,
+                    filename=fixtures/people.csv,
                     schema="create table people(id integer, name text, city text)",
                     columns=3,
                     affinity=integer

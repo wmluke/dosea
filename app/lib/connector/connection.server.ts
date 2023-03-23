@@ -1,3 +1,4 @@
+import path from "path";
 import { CsvConnection } from "~/lib/connector/csv.server";
 import { PostgresConnection } from "~/lib/connector/postgres.server";
 import { SqliteConnection } from "~/lib/connector/sqlite.server";
@@ -49,13 +50,15 @@ if (process.env.NODE_ENV === "production") {
 
 function createConnection(url: string, type: string): Connection {
     const readonly = true;
+    const dataDir = process.env.DOSEA_DATA_DIR ?? path.resolve(process.cwd(), "data");
+    const allowedPaths = [process.env.DOSEA_ALLOWED_PATHS ?? `${dataDir}/**/*`];
     switch (type) {
         case "sqlite":
-            return new SqliteConnection({ filePath: url, readonly });
+            return new SqliteConnection({ filePath: url, readonly, dataDir, allowedPaths });
         case "postgres":
             return new PostgresConnection({ connectionString: url, readonly });
         case "csv":
-            return new CsvConnection({ filePath: url });
+            return new CsvConnection({ filePath: url, dataDir, allowedPaths });
         default:
             throw "Unsupported dataset type";
     }
