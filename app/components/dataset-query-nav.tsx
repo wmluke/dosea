@@ -23,7 +23,10 @@ export function DatasetQueryNav({ dataset }: DatasetQueryNavProps) {
                             className="no-underline"
                         >
                             <MagnifyingGlassIcon className="h-6 w-6" />
-                            <code className="p-0">{truncate(q.query, 40)}</code>
+                            {q.name ?
+                                <span>{q.name}</span> :
+                                <code className="p-0">{truncate(q.query, 40)}</code>
+                            }
                         </NavLink>
                     </li>
                 );

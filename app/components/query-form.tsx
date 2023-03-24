@@ -13,6 +13,14 @@ export function QueryForm({ dataset, query }: QueryFormProps) {
             <input type="hidden" name="queryId" value={query?.id} />
             <div className="form-control">
                 <label className="label">
+                    <span className="label-text">Name</span>
+                </label>
+                <input type="text" name="name" defaultValue={query?.name ?? undefined}
+                       placeholder="Name"
+                       className="input-bordered input" />
+            </div>
+            <div className="form-control">
+                <label className="label">
                     <span className="label-text">SQL</span>
                     <span className="label-text-alt">{type}</span>
                 </label>
