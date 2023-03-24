@@ -95,7 +95,7 @@ export function ChartEditor({ data, config, queryId, chartId, className }: Chart
                     </label>
                     <textarea
                         name="configJson"
-                        className={`textarea-bordered textarea h-[600px] ${!isValidJson ? "textarea-error" : ""}`}
+                        className={`textarea-bordered textarea h-[400px] ${!isValidJson ? "textarea-error" : ""}`}
                         defaultValue={JSON.stringify(chartConfig, null, 4)}
                         onChange={onChange}
                     ></textarea>
