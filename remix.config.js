@@ -8,7 +8,8 @@ module.exports = {
         /^echarts.*/,
         /^zrender.*/,
         "@sindresorhus/slugify",
-        "@sindresorhus/transliterate"
+        "@sindresorhus/transliterate",
+        "escape-string-regexp"
     ],
     // servermoduleformat: "esm",
     future: {
