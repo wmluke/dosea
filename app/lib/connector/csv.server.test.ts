@@ -10,7 +10,7 @@ describe("CsvConnection", () => {
 
             const options: SqliteConnectionOptions = {
                 filePath: "Metro_Interstate_Traffic_Volume.csv",
-                dataDir: path.resolve(process.cwd(), "fixtures")
+                dataDir: path.resolve(process.cwd(), "fixtures", "datasets")
             };
             const db = await new CsvConnection(options)
                 .connect();

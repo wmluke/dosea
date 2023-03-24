@@ -191,7 +191,7 @@ describe("SqliteDatabase", () => {
         it("should load sqlean vsv extension", async () => {
             await db.exec(`
                 create virtual table people using vsv(
-                    filename=fixtures/people.csv,
+                    filename=fixtures/datasets/people.csv,
                     schema="create table people(id integer, name text, city text)",
                     columns=3,
                     affinity=integer
