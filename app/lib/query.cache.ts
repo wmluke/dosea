@@ -116,10 +116,10 @@ export async function runQueryDangerouslyAndUnsafe<T = ChartData>(query: QueryWi
     }
 }
 
-export async function runQuery<T = ChartData>({
-                                                  queryId,
-                                                  datasetId
-                                              }: {
+export async function runQuery({
+                                   queryId,
+                                   datasetId
+                               }: {
     queryId?: string;
     datasetId?: string;
 }) {

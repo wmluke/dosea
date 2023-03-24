@@ -7,7 +7,7 @@ import { QueryForm } from "~/components/query-form";
 import { SectionDropdown } from "~/components/section-dropdown";
 import { runQueryCache } from "~/lib/query.cache";
 import { saveQuery } from "~/models/query.server";
-import { useWorkspaceContext } from "~/routes/workspace.$workspaceId";
+import { useWorkspaceContext } from "~/routes/workspace";
 import { loadDataset } from "~/routes/workspace.$workspaceId.dataset.$datasetId";
 
 export async function action({ params, request }: ActionArgs) {

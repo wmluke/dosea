@@ -7,14 +7,25 @@ export async function getWorkspaceById(id: string) {
 
 export type WorkspaceWithDatasets = Prisma.PromiseReturnType<typeof getWorkspaceById>;
 
-export async function getWorkspaces() {
+export async function getWorkspaces(includeDatasets = false) {
     return prisma.workspace.findMany({
         include: {
-            datasets: true,
-        },
+            datasets: includeDatasets
+        }
     });
 }
 
-export async function createWorkspace({ name }: { name: string }) {
+export interface WorkspaceInput {
+    id?: string;
+    name: string;
+}
+
+export async function saveWorkspace({ id, name }: WorkspaceInput) {
+    if (id) {
+        return prisma.workspace.update({
+            data: { name },
+            where: { id }
+        });
+    }
     return prisma.workspace.create({ data: { name } });
 }

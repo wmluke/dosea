@@ -13,10 +13,6 @@ function isLinux(): boolean {
     return os.platform().toLowerCase().includes("linux");
 }
 
-function isWindows() {
-    return os.platform().toLowerCase().includes("win");
-}
-
 function isArm(): boolean {
     return os.arch().toLowerCase().includes("arm");
 }

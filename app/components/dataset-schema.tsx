@@ -1,4 +1,5 @@
-import { Table } from "~/lib/connector/connection.server";
+import type { Table } from "~/lib/connector/connection.server";
+import { classNames } from "~/utils";
 
 export interface DatasetSchemaProps {
     tables?: Table[];
@@ -7,7 +8,7 @@ export interface DatasetSchemaProps {
 
 export function DatasetSchema({ tables, className }: DatasetSchemaProps) {
     return (
-        <ul className={className}>
+        <ul className={classNames("prose", className)}>
             {tables?.map((t) => {
                 return (
                     <li key={t.name} tabIndex={0}>

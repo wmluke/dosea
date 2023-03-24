@@ -25,7 +25,7 @@ export function RightPane({ queryResult, queryError, tables }: RightPaneProps) {
                 />
             </div>
             <div className="block h-[75vh] overflow-hidden">
-                <h3 className="prose">Tables</h3>
+                <h3 className="prose">Schema</h3>
                 <DatasetSchema tables={tables} className="h-full overflow-hidden overflow-y-auto text-sm" />
             </div>
         </div>

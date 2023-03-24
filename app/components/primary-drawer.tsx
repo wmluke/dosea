@@ -1,10 +1,12 @@
+import type { ReactNode } from "react";
+
 export interface PrimaryDrawerProps {
     open?: boolean;
-    drawerContent: React.ReactNode;
-    drawerSideContent: React.ReactNode;
+    children: ReactNode | ReactNode[];
+    drawerSideContent: ReactNode;
 }
 
-export function PrimaryDrawer({ drawerContent, drawerSideContent, open = false }: PrimaryDrawerProps) {
+export function PrimaryDrawer({ children, drawerSideContent, open = false }: PrimaryDrawerProps) {
     return (
         <div className="drawer-tablet drawer drawer-primary">
             <input id="primary-drawer" type="checkbox" defaultChecked={open}
@@ -12,7 +14,7 @@ export function PrimaryDrawer({ drawerContent, drawerSideContent, open = false }
             <div className="drawer-content drawer-primary-content flex flex-col"
                  style={{ scrollBehavior: "smooth", scrollPaddingTop: "5rem" }}
             >
-                {drawerContent}
+                {children}
             </div>
             <div className="drawer-side drawer-primary-side"
                  style={{ scrollBehavior: "smooth", scrollPaddingTop: "5rem" }}>

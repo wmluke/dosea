@@ -57,7 +57,7 @@ export function ChartsGrid({ charts, queryResult }: ChartsGridProps) {
                 </div>
             );
         });
-    }, [charts?.length]);
+    }, [charts, queryResult]);
 
     return <ResponsiveGridLayout
         rowHeight={500}

@@ -1,5 +1,5 @@
 import { DatasetForm } from "~/components/dataset-form";
-import { useWorkspaceContext } from "~/routes/workspace.$workspaceId";
+import { useWorkspaceContext } from "~/routes/workspace";
 
 export default function DatasetEditPage() {
     const { dataset } = useWorkspaceContext();

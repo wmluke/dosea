@@ -3,7 +3,6 @@ import { Outlet } from "@remix-run/react";
 import type { ActionArgs } from "@remix-run/server-runtime";
 import { saveDataset } from "~/models/dataset.server";
 import { getWorkspaceById } from "~/models/workspace.server";
-import { useWorkspaceContext } from "~/routes/workspace.$workspaceId";
 import { badRequest, notFound } from "~/utils";
 
 export async function action({ request, params }: ActionArgs) {
@@ -51,8 +50,7 @@ export const handle = {
 };
 
 export default function() {
-    const { workspace, dataset, query } = useWorkspaceContext();
     return (
-        <Outlet context={{ workspace, dataset, query }} />
+        <Outlet />
     );
 }
