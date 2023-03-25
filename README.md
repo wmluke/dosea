@@ -10,7 +10,7 @@ Take a gander at the [demo](https://dosea-7b28.fly.dev/).
 
 ## Features
 
-* Supports Sqlite and Postgres datasets
+* Supports Sqlite, Postgres, and CSV datasets
 * Readonly DB connections
 * Detailed query results
 * Detailed Table Schema
@@ -49,7 +49,7 @@ npm run start
 * User Authentication
 * Support for mysql
 * Support for influx, prometheus
-* Support for CSV, JSON, XML, YAML
+* Support for JSON, XML, YAML
 * Support for Google Sheets, Excel
 * Dashboards
 * Themes
