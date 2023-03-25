@@ -13,7 +13,8 @@ import { getQueryById } from "~/models/query.server";
 import type { WorkspaceWithDatasets } from "~/models/workspace.server";
 import { getWorkspaceById, getWorkspaces, saveWorkspace } from "~/models/workspace.server";
 import { loadDatasetTable } from "~/routes/workspace.$workspaceId.dataset.$datasetId";
-import { badRequest } from "~/utils";
+import type { ConvertDatesToStrings } from "~/utils";
+import { badRequest, notFound } from "~/utils";
 
 export async function action({ request }: ActionArgs) {
     const formData = await request.formData();
@@ -45,14 +46,26 @@ export async function loader({ params }: LoaderArgs) {
     const workspaces = await getWorkspaces();
     const context: LoaderContext = { workspaces };
     if (workspaceId) {
-        context.workspace = await getWorkspaceById(workspaceId);
+        const workspace = await getWorkspaceById(workspaceId);
+        if (!workspace) {
+            throw notFound(" Workspace");
+        }
+        context.workspace = workspace;
     }
     if (datasetId) {
-        context.dataset = await getDatasetById(datasetId);
+        const dataset = await getDatasetById(datasetId);
+        if (!dataset) {
+            throw notFound("Dataset");
+        }
+        context.dataset = dataset;
         context.tables = await loadDatasetTable(context.dataset!);
     }
     if (queryId) {
-        context.query = await getQueryById(queryId);
+        const query = await getQueryById(queryId);
+        if (!query) {
+            throw notFound("Query");
+        }
+        context.query = query;
     }
     return json(context);
 }
@@ -68,7 +81,12 @@ export const handle: PanelMatch = {
 
 
 export default function WorkspacePage() {
-    const { workspace, dataset, query, tables } = useLoaderData<typeof loader>() as WorkspaceContext;
+    const {
+        workspace,
+        dataset,
+        query,
+        tables
+    } = useLoaderData<typeof loader>() as ConvertDatesToStrings<WorkspaceContext>;
     return (
         <PageLayout workspace={workspace} dataset={dataset} query={query} tables={tables}>
             <Outlet />

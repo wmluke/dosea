@@ -32,14 +32,6 @@ export function getQueryById(id: string) {
 
 export type QueryWithDatasetAndCharts = Prisma.PromiseReturnType<typeof getQueryById>;
 
-export function getQueriesByDatasetId(datasetId: string) {
-    return prisma.datasetQuery.findMany({
-        where: {
-            datasetId
-        }
-    });
-}
-
 export function deleteQuery(id: string) {
     return prisma.datasetQuery.delete({ where: { id } });
 

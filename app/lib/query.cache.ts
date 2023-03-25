@@ -85,7 +85,7 @@ export async function loadQuery({
     }
     const query = await getQueryById(queryId);
     if (!query) {
-        throw notFound();
+        throw notFound("Query");
     }
     if (datasetId && query.datasetId !== datasetId) {
         throw badRequest();

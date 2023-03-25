@@ -1,14 +1,12 @@
 import type { LoaderArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
-import { Outlet } from "@remix-run/react";
+import { Outlet, useRouteLoaderData } from "@remix-run/react";
 import type { PanelMatch } from "~/components/page-layout";
 import { RightPane } from "~/components/right-pane";
 import type { QueryError } from "~/lib/query.cache";
-import { loadQuery, runQuery } from "~/lib/query.cache";
-import type { QueryWithDatasetAndCharts } from "~/models/query.server";
+import { runQuery } from "~/lib/query.cache";
 
 export interface QueryPageLoaderReturn<T = Array<Record<string, any>>> {
-    query: QueryWithDatasetAndCharts;
     queryResult: {
         result?: T;
         error?: QueryError;
@@ -17,9 +15,12 @@ export interface QueryPageLoaderReturn<T = Array<Record<string, any>>> {
 
 export async function loader({ params }: LoaderArgs) {
     const { datasetId, queryId } = params;
-    const query = await loadQuery({ queryId, datasetId });
     const queryResult = await runQuery({ queryId, datasetId }) as any;
-    return json({ query, queryResult });
+    return json({ queryResult });
+}
+
+export function useQueryLayoutLoaderData() {
+    return useRouteLoaderData("routes/workspace.$workspaceId.dataset.$datasetId.query.$queryId") as QueryPageLoaderReturn;
 }
 
 export const handle: PanelMatch = {
@@ -33,7 +34,7 @@ export const handle: PanelMatch = {
     }
 };
 
-export default function QueryPage() {
+export default function QueryLayout() {
     return (
         <Outlet />
     );

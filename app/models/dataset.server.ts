@@ -1,8 +1,6 @@
 import type { Prisma } from "@prisma/client";
 import { prisma } from "~/db.server";
 
-export type ConnectionType = "sqlite" | "csv";
-
 export interface DatasetInput {
     id?: string;
     name: string;

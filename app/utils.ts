@@ -76,14 +76,16 @@ export function useLocalStorage<T>(key: string, initialValue: T) {
 }
 
 export function notFound(message?: string) {
-    return new Response(["Not Found", message].filter(Boolean).join(": "), {
-        status: 404
+    return new Response(null, {
+        status: 404,
+        statusText: ["Not Found", message].filter(Boolean).join(": ")
     });
 }
 
 export function badRequest(message?: string) {
-    return new Response(["Bad Request", message].filter(Boolean).join(": "), {
-        status: 400
+    return new Response(null, {
+        status: 400,
+        statusText: ["Bad Request", message].filter(Boolean).join(": ")
     });
 }
 

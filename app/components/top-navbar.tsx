@@ -1,9 +1,10 @@
 import { Bars3Icon, FolderIcon } from "@heroicons/react/24/solid";
 import { Link } from "@remix-run/react";
 import type { WorkspaceWithDatasets } from "~/models/workspace.server";
+import type { ConvertDatesToStrings } from "~/utils";
 
 export interface TopNavbarProps {
-    workspace?: WorkspaceWithDatasets;
+    workspace?: ConvertDatesToStrings<WorkspaceWithDatasets>;
 }
 
 export function TopNavbar({ workspace }: TopNavbarProps) {

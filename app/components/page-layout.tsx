@@ -6,12 +6,13 @@ import { PrimaryDrawer } from "~/components/primary-drawer";
 import { SecondaryDrawer } from "~/components/secondary-drawer";
 import { TopNavbar } from "~/components/top-navbar";
 import type { WorkspaceContext } from "~/routes/workspace";
+import type { ConvertDatesToStrings } from "~/utils";
 
 export interface PageLayoutProps {
     children: ReactNode;
 }
 
-export type PanelItemProps = WorkspaceContext & { match: RouteMatch };
+export type PanelItemProps = ConvertDatesToStrings<WorkspaceContext> & { match: RouteMatch };
 export type PanelItem = (props: PanelItemProps) => ReactNode;
 export type PanelMatch = {
     primaryPanelItem?: PanelItem,
@@ -19,7 +20,7 @@ export type PanelMatch = {
     primaryDrawerOpen?: boolean,
 };
 
-export const PageLayoutContext = createContext<WorkspaceContext>({});
+export const PageLayoutContext = createContext<ConvertDatesToStrings<WorkspaceContext>>({});
 
 export function usePageLayoutContext() {
     return useContext(PageLayoutContext);
@@ -29,7 +30,7 @@ export function usePageLayoutContext() {
  * Render the last item emitted by the nested router chain
  * This enables some template inheritance style of composition
  */
-function renderPanelContent(items: [PanelItem, RouteMatch][] = [], context: WorkspaceContext) {
+function renderPanelContent(items: [PanelItem, RouteMatch][] = [], context: ConvertDatesToStrings<WorkspaceContext>) {
     const [item, match] = items.pop() ?? [];
     if (!item || !match) {
         return <></>;
@@ -37,7 +38,13 @@ function renderPanelContent(items: [PanelItem, RouteMatch][] = [], context: Work
     return item({ match, ...context });
 }
 
-export function PageLayout({ children, workspace, dataset, query, tables }: PageLayoutProps & WorkspaceContext) {
+export function PageLayout({
+                               children,
+                               workspace,
+                               dataset,
+                               query,
+                               tables
+                           }: PageLayoutProps & ConvertDatesToStrings<WorkspaceContext>) {
     const primaryPanelItems: [PanelItem, RouteMatch][] = [];
     const secondaryPanelItems: [PanelItem, RouteMatch][] = [];
     const matches = useMatches();

@@ -7,12 +7,14 @@ import { ChartEditor } from "~/components/chart-editor";
 import { loadQuery, runQuery } from "~/lib/query.cache";
 import type { ChartWithQuery } from "~/models/chartconfig.server";
 import { getChartConfigById, saveChartConfig } from "~/models/chartconfig.server";
+import type { QueryWithDatasetAndCharts } from "~/models/query.server";
 import type { QueryPageLoaderReturn } from "~/routes/workspace.$workspaceId.dataset.$datasetId.query.$queryId";
 import { badRequest, notFound } from "~/utils";
 
 
 export interface ChartPageLoaderReturn extends QueryPageLoaderReturn {
     chartConfig: ChartWithQuery;
+    query: QueryWithDatasetAndCharts;
 }
 
 export async function loader({ params }: LoaderArgs) {

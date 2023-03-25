@@ -2,10 +2,11 @@ import { MagnifyingGlassIcon } from "@heroicons/react/20/solid";
 import { PlusCircleIcon } from "@heroicons/react/24/solid";
 import { NavLink } from "@remix-run/react";
 import type { DatasetWithQueries } from "~/models/dataset.server";
+import type { ConvertDatesToStrings } from "~/utils";
 import { classNames, truncate } from "~/utils";
 
 export interface DatasetQueryNavProps {
-    dataset?: DatasetWithQueries;
+    dataset?: ConvertDatesToStrings<DatasetWithQueries>;
 }
 
 export function DatasetQueryNav({ dataset }: DatasetQueryNavProps) {

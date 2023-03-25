@@ -3,12 +3,13 @@ import { Link, NavLink } from "@remix-run/react";
 import { DatasetQueryNav } from "~/components/dataset-query-nav";
 import type { DatasetWithQueries } from "~/models/dataset.server";
 import type { WorkspaceWithDatasets } from "~/models/workspace.server";
+import type { ConvertDatesToStrings } from "~/utils";
 import { classNames } from "~/utils";
 
 export interface LeftNavProps {
-    workspace?: WorkspaceWithDatasets;
+    workspace?: ConvertDatesToStrings<WorkspaceWithDatasets>;
     workspaces?: WorkspaceWithDatasets[];
-    dataset?: DatasetWithQueries;
+    dataset?: ConvertDatesToStrings<DatasetWithQueries>;
 }
 
 export function LeftNav({ workspace, dataset, workspaces }: LeftNavProps) {

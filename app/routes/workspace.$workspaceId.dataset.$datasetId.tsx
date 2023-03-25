@@ -10,11 +10,11 @@ import { badRequest, notFound, sanitizeConnectionUrl } from "~/utils";
 
 export async function loadDataset(datasetId?: string, workspaceId?: string) {
     if (!datasetId) {
-        throw notFound();
+        throw badRequest("datasetId is required");
     }
     const dataset = await getDatasetById(datasetId as string);
     if (!dataset) {
-        throw notFound();
+        throw notFound("Dataset");
     }
     if (workspaceId && dataset.workspaceId != workspaceId) {
         throw badRequest();

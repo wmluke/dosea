@@ -1,21 +1,13 @@
 import { ChartPieIcon } from "@heroicons/react/24/solid";
-import type { LoaderArgs } from "@remix-run/node";
-import { json } from "@remix-run/node";
-import { Link, useLoaderData } from "@remix-run/react";
+import { Link } from "@remix-run/react";
 import { ChartsGrid } from "~/components/charts-grid";
 import { SectionDropdown } from "~/components/section-dropdown";
-import { loadQuery, runQuery } from "~/lib/query.cache";
+import { useWorkspaceContext } from "~/routes/workspace";
+import { useQueryLayoutLoaderData } from "~/routes/workspace.$workspaceId.dataset.$datasetId.query.$queryId";
 
-export async function loader({ params }: LoaderArgs) {
-    const { datasetId, queryId } = params;
-    const query = await loadQuery({ queryId, datasetId });
-    const queryResult = await runQuery({ queryId, datasetId }) as any;
-    return json({ query, queryResult });
-}
-
-export default function QueryPage() {
-    const data = useLoaderData<typeof loader>();
-    const query = data.query;
+export default function QueryIndexPage() {
+    const data = useQueryLayoutLoaderData();
+    const { query } = useWorkspaceContext();
     const addChartUrl = [
         "/workspace",
         query?.dataset.workspaceId,
