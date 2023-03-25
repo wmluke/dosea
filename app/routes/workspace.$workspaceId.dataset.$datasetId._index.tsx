@@ -3,7 +3,7 @@ import { DatasetSchema } from "~/components/dataset-schema";
 import { useWorkspaceContext } from "~/routes/workspace";
 
 export default function() {
-    const { tables } = useWorkspaceContext();
+    const { schema } = useWorkspaceContext();
     return (
         // <section className="prose mx-0 px-0 mt-2">
         //     <h2>Schema</h2>
@@ -17,7 +17,7 @@ export default function() {
                     Schema
                 </h3>
             </div>
-            <DatasetSchema tables={tables} />
+            <DatasetSchema schema={schema} />
         </section>
     );
 }

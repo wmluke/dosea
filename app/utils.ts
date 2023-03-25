@@ -126,3 +126,9 @@ export function sanitizeConnectionUrl(connection?: string) {
     }
     return connection;
 }
+
+export function daysAgo(days = 0) {
+    const startDate = new Date();
+    startDate.setDate(startDate.getDate() - days);
+    return startDate;
+}

@@ -1,9 +1,8 @@
-import type { Table } from "~/lib/connector/connection.server";
-import type { PromSchema } from "~/lib/connector/prometheus.server";
+import type { Schema } from "~/lib/connector/connection.server";
 import { classNames } from "~/utils";
 
 export interface DatasetSchemaProps {
-    tables?: Table[] | PromSchema;
+    schema?: Schema;
     className?: string;
 }
 
@@ -18,11 +17,11 @@ function List({ label, values }: { label: string, values: string[] }) {
     );
 }
 
-export function DatasetSchema({ tables, className }: DatasetSchemaProps) {
-    if (Array.isArray(tables)) {
+export function DatasetSchema({ schema, className }: DatasetSchemaProps) {
+    if (Array.isArray(schema)) {
         return (
             <ul className={classNames("prose", className)}>
-                {tables?.map((t) => {
+                {schema?.map((t) => {
                     return (
                         <li key={t.name} tabIndex={0}>
                             <span>{t.name}</span>
@@ -45,10 +44,10 @@ export function DatasetSchema({ tables, className }: DatasetSchemaProps) {
     }
     return (
         <div className="grid grid-cols-2 gap-1">
-            <List label="Instances" values={tables?.instances ?? []} />
-            <List label="Jobs" values={tables?.jobs ?? []} />
-            <List label="Labels" values={tables?.labels ?? []} />
-            <List label="Metrics" values={tables?.metrics ?? []} />
+            <List label="Instances" values={schema?.instances ?? []} />
+            <List label="Jobs" values={schema?.jobs ?? []} />
+            <List label="Labels" values={schema?.labels ?? []} />
+            <List label="Metrics" values={schema?.metrics ?? []} />
         </div>
     );
 

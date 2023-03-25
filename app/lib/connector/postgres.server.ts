@@ -68,10 +68,10 @@ export class PostgresDB implements DB {
     public async getSchema(): Promise<Table[]> {
         const res = await this.client.query(`
             SELECT table_name
-            FROM information_schema.tables
+            FROM information_schema.schema
             WHERE table_schema = 'public';
         `);
-        const tables: Table[] = [];
+        const schema: Table[] = [];
         for (const row of res.rows) {
             const tableName = row["table_name"];
             const tableColsResult = await this.client.query(`
@@ -79,7 +79,7 @@ export class PostgresDB implements DB {
                 FROM information_schema.columns
                 WHERE table_schema = 'public'
                   AND table_name = $1`, [tableName]);
-            tables.push({
+            schema.push({
                 name: tableName,
                 columns: tableColsResult.rows.map(({ column_name, data_type }) => {
                     return {
@@ -89,7 +89,7 @@ export class PostgresDB implements DB {
                 })
             });
         }
-        return tables;
+        return schema;
     }
 
     public async query(sql: string): Promise<any> {

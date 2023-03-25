@@ -24,11 +24,11 @@ export function useQueryLayoutLoaderData() {
 }
 
 export const handle: PanelMatch = {
-    secondaryPanelItem({ match, tables }) {
+    secondaryPanelItem({ match, schema }) {
         const { queryResult } = match.data as QueryPageLoaderReturn;
         return (
             <div className="prose">
-                <RightPane queryResult={queryResult.result} queryError={queryResult.error} tables={tables} />
+                <RightPane queryResult={queryResult.result} queryError={queryResult.error} schema={schema} />
             </div>
         );
     }

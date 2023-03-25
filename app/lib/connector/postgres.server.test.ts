@@ -29,15 +29,15 @@ describe("PostgresConnection", () => {
         });
 
         // skip until i provision DOSEA_TEST_DATASET_PG in GH workflow
-        it.skip("should describe db tables", async () => {
+        it.skip("should describe db schema", async () => {
             const connection = new PostgresConnection({
                 connectionString: connectionString,
                 readonly: true
             });
             const db = await connection.connect();
-            const tables = await db.getSchema();
-            expect(tables).toBeDefined();
-            expect(tables).toContainEqual({
+            const schema = await db.getSchema();
+            expect(schema).toBeDefined();
+            expect(schema).toContainEqual({
                 name: "Workspace",
                 columns: [
                     { name: "id", type: "text" },

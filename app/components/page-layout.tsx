@@ -43,7 +43,7 @@ export function PageLayout({
                                workspace,
                                dataset,
                                query,
-                               tables
+                               schema
                            }: PageLayoutProps & ConvertDatesToStrings<WorkspaceContext>) {
     const primaryPanelItems: [PanelItem, RouteMatch][] = [];
     const secondaryPanelItems: [PanelItem, RouteMatch][] = [];
@@ -57,12 +57,12 @@ export function PageLayout({
             secondaryPanelItems.push([secondaryPanelItem, match]);
         }
     }
-    const primaryPanelContent = renderPanelContent(primaryPanelItems, { workspace, dataset, query, tables });
-    const secondaryPanelContent = renderPanelContent(secondaryPanelItems, { workspace, dataset, query, tables });
+    const primaryPanelContent = renderPanelContent(primaryPanelItems, { workspace, dataset, query, schema });
+    const secondaryPanelContent = renderPanelContent(secondaryPanelItems, { workspace, dataset, query, schema });
 
     const openDrawer = matches[matches.length - 1]?.handle?.primaryDrawerOpen ?? false;
     return (
-        <PageLayoutContext.Provider value={{ workspace, dataset, query, tables }}>
+        <PageLayoutContext.Provider value={{ workspace, dataset, query, schema }}>
             <PrimaryDrawer
                 open={openDrawer}
                 drawerSideContent={primaryPanelContent}

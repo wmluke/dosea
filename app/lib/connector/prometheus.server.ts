@@ -1,5 +1,6 @@
 import { PrometheusDriver } from "prometheus-query";
 import type { Connection, DB } from "~/lib/connector/connection.server";
+import { daysAgo } from "~/utils";
 
 export interface PrometheusConnectionOptions {
     endpoint: string;
@@ -32,7 +33,13 @@ export class PrometheusConnection implements Connection<PromSchema> {
     }
 }
 
-export class PrometheusDB implements DB<PromSchema> {
+export interface PromQueryOptions {
+    start?: number | Date;
+    end?: number | Date;
+    step?: string;
+}
+
+export class PrometheusDB implements DB<PromSchema, PromQueryOptions> {
 
     constructor(private readonly prom: PrometheusDriver) {
     }
@@ -57,10 +64,12 @@ export class PrometheusDB implements DB<PromSchema> {
         return { labels, metrics, instances, jobs };
     }
 
-    public query(sql: string): Promise<any> {
-        const startDate = new Date();
-        startDate.setDate(startDate.getDate() - 100);
-        return this.prom.rangeQuery(sql, startDate, new Date(), "1d");
+    public query(promQL: string, options: PromQueryOptions = {}): Promise<any> {
+        const { start = daysAgo(7), end = new Date(), step = "1d" } = options;
+        if (start.valueOf() === end.valueOf()) {
+            return this.prom.instantQuery(promQL, start);
+        }
+        return this.prom.rangeQuery(promQL, start, end, step);
     }
 
 }

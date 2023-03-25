@@ -108,11 +108,11 @@ describe("SqliteDatabase", () => {
 
     describe("getTables", () => {
 
-        it("should describe db tables", async () => {
-            const tables = await db.getSchema();
+        it("should describe db schema", async () => {
+            const schema = await db.getSchema();
 
-            expect(tables).toBeDefined();
-            expect(tables).toContainEqual({
+            expect(schema).toBeDefined();
+            expect(schema).toContainEqual({
                 name: "Workspace",
                 columns: [
                     { name: "id", type: "TEXT" },

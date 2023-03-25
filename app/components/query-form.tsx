@@ -1,5 +1,6 @@
 import type { Dataset, DatasetQuery } from "@prisma/client";
-import { joinTruthy } from "~/utils";
+import { useState } from "react";
+import { daysAgo, joinTruthy } from "~/utils";
 
 export interface QueryFormProps {
     dataset: Dataset;
@@ -12,6 +13,68 @@ const queryLang: { [type: string]: string } = {
     csv: "SQL (Sqlite)",
     prometheus: "PromQL"
 };
+type PromQLProps = { type?: string, queryOptionsJson?: string | null }
+
+function formatDate(d?: string | number | Date | null): string | undefined {
+    if (typeof d === "number") {
+        return formatDate(new Date(d as number));
+    }
+    if (typeof d === "string") {
+        return d.split("T")[0];
+    }
+    return d?.toISOString().split("T")[0];
+}
+
+export function PromQLFields({ type, queryOptionsJson }: PromQLProps) {
+    const {
+        start = daysAgo(7),
+        end = new Date(),
+        step = "1d"
+    } = JSON.parse(queryOptionsJson ?? "{}");
+
+    const [json, setJson] = useState(JSON.stringify({ start, end, step }));
+
+    if (type !== "prometheus") {
+        return <></>;
+    }
+
+    function onChange(field: string, value: any) {
+        const obj = JSON.parse(json);
+        switch (field) {
+            case "start":
+                obj[field] = new Date(value + "T00:00:00.000Z");
+                break;
+            case "end":
+                obj[field] = new Date(value + "T23:59:59.999Z");
+                break;
+            default:
+                obj[field] = value;
+                break;
+        }
+        setJson(JSON.stringify(obj));
+    }
+
+    return (
+        <div className="form-control">
+            <label className="label">
+                <span className="label-text">Date Range</span>
+            </label>
+            <input type="hidden" name="queryOptionsJson" value={json} readOnly={true} />
+            <div className="grid grid-cols-3 gap-2">
+                <input type="date" defaultValue={formatDate(start)}
+                       onChange={(e) => onChange("start", e.target.value)}
+                       className="input-bordered input" />
+                <input type="date" defaultValue={formatDate(end)}
+                       onChange={(e) => onChange("end", e.target.value)}
+                       className="input-bordered input" />
+                <input type="text"
+                       onChange={(e) => onChange("step", e.target.value)}
+                       placeholder="step" defaultValue={step}
+                       className="input-bordered input" />
+            </div>
+        </div>
+    );
+}
 
 export function QueryForm({ dataset, query }: QueryFormProps) {
     const { id, workspaceId, type } = dataset;
@@ -27,6 +90,7 @@ export function QueryForm({ dataset, query }: QueryFormProps) {
                        placeholder="Name"
                        className="input-bordered input" />
             </div>
+            <PromQLFields type={type} queryOptionsJson={query?.queryOptionsJson} />
             <div className="form-control">
                 <label className="label">
                     <span className="label-text">{ql}</span>

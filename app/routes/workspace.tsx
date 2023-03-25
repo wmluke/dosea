@@ -5,7 +5,7 @@ import type { ActionArgs } from "@remix-run/server-runtime";
 import { LeftNav } from "~/components/left-nav";
 import type { PanelMatch } from "~/components/page-layout";
 import { PageLayout, usePageLayoutContext } from "~/components/page-layout";
-import type { Table } from "~/lib/connector/connection.server";
+import type { Schema } from "~/lib/connector/connection.server";
 import type { DatasetWithQueries } from "~/models/dataset.server";
 import { getDatasetById } from "~/models/dataset.server";
 import type { QueryWithDatasetAndCharts } from "~/models/query.server";
@@ -30,7 +30,7 @@ export async function action({ request }: ActionArgs) {
 export interface WorkspaceContext {
     workspace?: WorkspaceWithDatasets;
     dataset?: DatasetWithQueries | null;
-    tables?: Table[];
+    schema?: Schema;
     query?: QueryWithDatasetAndCharts;
 }
 
@@ -58,7 +58,7 @@ export async function loader({ params }: LoaderArgs) {
             throw notFound("Dataset");
         }
         context.dataset = dataset;
-        context.tables = await loadDatasetTable(context.dataset!);
+        context.schema = await loadDatasetTable(context.dataset!);
     }
     if (queryId) {
         const query = await getQueryById(queryId);
@@ -85,10 +85,10 @@ export default function WorkspacePage() {
         workspace,
         dataset,
         query,
-        tables
+        schema
     } = useLoaderData<typeof loader>() as ConvertDatesToStrings<WorkspaceContext>;
     return (
-        <PageLayout workspace={workspace} dataset={dataset} query={query} tables={tables}>
+        <PageLayout workspace={workspace} dataset={dataset} query={query} schema={schema}>
             <Outlet />
         </PageLayout>
     );

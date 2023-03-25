@@ -6,17 +6,18 @@ export interface CreateQueryInput {
     name?: string;
     query: string;
     datasetId: string;
+    queryOptionsJson?: string;
 }
 
-export function saveQuery({ id, name, query, datasetId }: CreateQueryInput) {
+export function saveQuery({ id, name, query, datasetId, queryOptionsJson }: CreateQueryInput) {
     if (id) {
         return prisma.datasetQuery.update({
             where: { id },
-            data: { name: name ?? null, query }
+            data: { name: name ?? null, query, queryOptionsJson: queryOptionsJson ?? null }
         });
     }
     return prisma.datasetQuery.create({
-        data: { name: name ?? null, query, datasetId }
+        data: { name: name ?? null, query, datasetId, queryOptionsJson: queryOptionsJson ?? null }
     });
 }
 

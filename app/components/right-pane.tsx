@@ -1,17 +1,17 @@
 import type { ChartData } from "~/components/chart";
 import { DatasetSchema } from "~/components/dataset-schema";
 import { QueryResultsInspector } from "~/components/query-results-inspector";
-import type { Table } from "~/lib/connector/connection.server";
+import type { Schema } from "~/lib/connector/connection.server";
 import type { QueryError } from "~/lib/query.cache";
 import { classNames } from "~/utils";
 
 export interface RightPaneProps<T = ChartData> {
     queryResult?: T | null;
     queryError?: QueryError;
-    tables?: Table[];
+    schema?: Schema;
 }
 
-export function RightPane({ queryResult, queryError, tables }: RightPaneProps) {
+export function RightPane({ queryResult, queryError, schema }: RightPaneProps) {
     const emptyQueryResults = !queryResult && !queryError;
 
     return (
@@ -26,7 +26,7 @@ export function RightPane({ queryResult, queryError, tables }: RightPaneProps) {
             </div>
             <div className="block h-[75vh] overflow-hidden">
                 <h3 className="prose">Schema</h3>
-                <DatasetSchema tables={tables} className="h-full overflow-hidden overflow-y-auto text-sm" />
+                <DatasetSchema schema={schema} className="h-full overflow-hidden overflow-y-auto text-sm" />
             </div>
         </div>
     );

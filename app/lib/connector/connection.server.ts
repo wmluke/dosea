@@ -22,12 +22,14 @@ export interface Table {
     columns: Column[];
 }
 
-export interface DB<S = Table[]> {
+export type Schema = Table[] | PromSchema;
+
+export interface DB<S = Table[], OPS = Object> {
     close(): Promise<void>;
 
     getSchema(): Promise<S>;
 
-    query(sql: string): Promise<any>;
+    query(sql: string, options?: OPS): Promise<any>;
 
     exec(sql: string): Promise<any>;
 }
@@ -45,8 +47,6 @@ if (process.env.NODE_ENV === "production") {
     }
     _dbs = global.__dbs__;
 }
-
-export type Schema = Table[] | PromSchema;
 
 function createConnection(url: string, type: string): Connection<Schema> {
     const readonly = true;

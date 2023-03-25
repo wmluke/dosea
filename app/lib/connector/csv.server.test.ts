@@ -15,11 +15,11 @@ describe("CsvConnection", () => {
             const db = await new CsvConnection(options)
                 .connect();
 
-            const tables = await db.getSchema();
+            const schema = await db.getSchema();
 
-            expect(tables).toHaveLength(1);
-            expect(tables[0].name).toEqual("metro_interstate_traffic_volume_csv");
-            expect(tables[0].columns).toEqual([
+            expect(schema).toHaveLength(1);
+            expect(schema[0].name).toEqual("metro_interstate_traffic_volume_csv");
+            expect(schema[0].columns).toEqual([
                 { name: "holiday", type: "" },
                 { name: "temp", type: "" },
                 { name: "rain_1h", type: "" },

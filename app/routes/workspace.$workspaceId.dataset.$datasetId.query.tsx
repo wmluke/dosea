@@ -16,6 +16,7 @@ export async function action({ params, request }: ActionArgs) {
     const form = await request.formData();
     const queryId = form.get("queryId") as string;
     const name = form.get("name") as string;
+    const queryOptionsJson = form.get("queryOptionsJson") as string;
     const q = form.get("q") as string;
     if (!q) {
         throw Error("Missing field q");
@@ -24,6 +25,7 @@ export async function action({ params, request }: ActionArgs) {
         id: queryId,
         query: q,
         name,
+        queryOptionsJson,
         datasetId: datasetId!
     });
     runQueryCache.delete([queryId, datasetId].join("::"));
