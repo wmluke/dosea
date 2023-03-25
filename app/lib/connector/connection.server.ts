@@ -1,17 +1,15 @@
 import path from "path";
 import { CsvConnection } from "~/lib/connector/csv.server";
 import { PostgresConnection } from "~/lib/connector/postgres.server";
+import type { PromSchema } from "~/lib/connector/prometheus.server";
+import { PrometheusConnection } from "~/lib/connector/prometheus.server";
 import { SqliteConnection } from "~/lib/connector/sqlite.server";
 
-export interface ConnectionOptions {
-    readonly?: boolean;
-}
-
-export interface Connection {
+export interface Connection<S = Table[]> {
 
     normalizeAndValidate(): string;
 
-    connect(): Promise<DB>;
+    connect(): Promise<DB<S>>;
 }
 
 export interface Column {
@@ -24,10 +22,10 @@ export interface Table {
     columns: Column[];
 }
 
-export interface DB {
+export interface DB<S = Table[]> {
     close(): Promise<void>;
 
-    getTables(): Promise<Table[]>;
+    getSchema(): Promise<S>;
 
     query(sql: string): Promise<any>;
 
@@ -35,20 +33,22 @@ export interface DB {
 }
 
 declare global {
-    var __dbs__: Map<string, DB>;
+    var __dbs__: Map<string, DB<Schema>>;
 }
-let _dbs: Map<string, DB>;
+let _dbs: Map<string, DB<Schema>>;
 
 if (process.env.NODE_ENV === "production") {
-    _dbs = new Map<string, DB>();
+    _dbs = new Map<string, DB<Schema>>();
 } else {
     if (!global.__dbs__) {
-        global.__dbs__ = new Map<string, DB>();
+        global.__dbs__ = new Map<string, DB<Schema>>();
     }
     _dbs = global.__dbs__;
 }
 
-function createConnection(url: string, type: string): Connection {
+export type Schema = Table[] | PromSchema;
+
+function createConnection(url: string, type: string): Connection<Schema> {
     const readonly = true;
     const dataDir = process.env.DOSEA_DATA_DIR ?? path.resolve(process.cwd(), "data");
     const allowedPaths = [process.env.DOSEA_ALLOWED_PATHS ?? `${dataDir}/**/*`];
@@ -59,12 +59,14 @@ function createConnection(url: string, type: string): Connection {
             return new PostgresConnection({ connectionString: url, readonly });
         case "csv":
             return new CsvConnection({ filePath: url, dataDir, allowedPaths });
+        case "prometheus":
+            return new PrometheusConnection({ endpoint: url });
         default:
             throw "Unsupported dataset type";
     }
 }
 
-export async function connect(url: string, type: string): Promise<DB> {
+export async function connect(url: string, type: string): Promise<DB<Schema>> {
     const key = `${type}::${url}`;
     if (!_dbs.has(key)) {
         const db = await createConnection(url, type).connect();

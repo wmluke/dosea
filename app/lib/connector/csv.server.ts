@@ -90,8 +90,8 @@ export class CsvDatabase implements DB {
         return this.db.exec(sql);
     }
 
-    public getTables(): Promise<Table[]> {
-        return this.db.getTables();
+    public getSchema(): Promise<Table[]> {
+        return this.db.getSchema();
     }
 
     public query(sql: string): Promise<any> {

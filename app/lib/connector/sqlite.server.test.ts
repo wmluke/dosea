@@ -109,7 +109,7 @@ describe("SqliteDatabase", () => {
     describe("getTables", () => {
 
         it("should describe db tables", async () => {
-            const tables = await db.getTables();
+            const tables = await db.getSchema();
 
             expect(tables).toBeDefined();
             expect(tables).toContainEqual({

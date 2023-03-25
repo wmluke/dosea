@@ -25,7 +25,7 @@ export async function loadDataset(datasetId?: string, workspaceId?: string) {
 export async function loadDatasetTable(dataset: Dataset) {
     try {
         const db = await connect(dataset.connection, dataset.type);
-        return db.getTables();
+        return db.getSchema();
     } catch (e) {
         console.error(e);
         return [];

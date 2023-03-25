@@ -35,7 +35,7 @@ describe("PostgresConnection", () => {
                 readonly: true
             });
             const db = await connection.connect();
-            const tables = await db.getTables();
+            const tables = await db.getSchema();
             expect(tables).toBeDefined();
             expect(tables).toContainEqual({
                 name: "Workspace",

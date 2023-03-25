@@ -6,8 +6,16 @@ export interface QueryFormProps {
     query?: Partial<DatasetQuery> | null;
 }
 
+const queryLang: { [type: string]: string } = {
+    sqlite: "SQL",
+    postgres: "SQL",
+    csv: "SQL (Sqlite)",
+    prometheus: "PromQL"
+};
+
 export function QueryForm({ dataset, query }: QueryFormProps) {
     const { id, workspaceId, type } = dataset;
+    const ql = queryLang[type] ?? "UNKNOWN";
     return (
         <form method="post" action={joinTruthy(["/workspace", workspaceId, "dataset", id, "query"], "/")}>
             <input type="hidden" name="queryId" value={query?.id} />
@@ -21,8 +29,8 @@ export function QueryForm({ dataset, query }: QueryFormProps) {
             </div>
             <div className="form-control">
                 <label className="label">
-                    <span className="label-text">SQL</span>
-                    <span className="label-text-alt">{type}</span>
+                    <span className="label-text">{ql}</span>
+                    <span className="label-text-alt capitalize">{type}</span>
                 </label>
                 <textarea
                     name="q"

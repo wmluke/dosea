@@ -15,7 +15,7 @@ describe("CsvConnection", () => {
             const db = await new CsvConnection(options)
                 .connect();
 
-            const tables = await db.getTables();
+            const tables = await db.getSchema();
 
             expect(tables).toHaveLength(1);
             expect(tables[0].name).toEqual("metro_interstate_traffic_volume_csv");

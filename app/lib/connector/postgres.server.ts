@@ -65,7 +65,7 @@ export class PostgresDB implements DB {
         return this.client.query(sql);
     }
 
-    public async getTables(): Promise<Table[]> {
+    public async getSchema(): Promise<Table[]> {
         const res = await this.client.query(`
             SELECT table_name
             FROM information_schema.tables

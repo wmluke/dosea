@@ -27,6 +27,7 @@ export function DatasetForm(dataset: Partial<DatasetInput> & { workspaceId: stri
                         <option value="sqlite">Sqlite</option>
                         <option value="postgres">Postgres</option>
                         <option value="csv">CSV</option>
+                        <option value="prometheus">Prometheus</option>
                     </select>
                 </div>
                 <div className="form-control">

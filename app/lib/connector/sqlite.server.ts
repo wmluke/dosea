@@ -130,7 +130,7 @@ export class SqliteDatabase implements DB {
         return Promise.resolve();
     }
 
-    public getTables(): Promise<Table[]> {
+    public getSchema(): Promise<Table[]> {
         const rawTables = this.db
             .prepare(
                 `
