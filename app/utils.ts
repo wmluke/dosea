@@ -132,3 +132,11 @@ export function daysAgo(days = 0) {
     startDate.setDate(startDate.getDate() - days);
     return startDate;
 }
+
+export function err(e: any) {
+    return {
+        code: e?.code,
+        message: e?.message,
+        type: e?.name ?? typeof e
+    };
+}

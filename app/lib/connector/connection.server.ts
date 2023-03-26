@@ -10,6 +10,8 @@ export interface Connection<S = Table[]> {
     normalizeAndValidate(): string;
 
     connect(): Promise<DB<S>>;
+
+    test(): Promise<boolean>;
 }
 
 export interface Column {
@@ -69,8 +71,9 @@ function createConnection(url: string, type: string): Connection<Schema> {
 export async function connect(url: string, type: string): Promise<DB<Schema>> {
     const key = `${type}::${url}`;
     if (!_dbs.has(key)) {
-        const db = await createConnection(url, type).connect();
-        _dbs.set(key, db);
+        const connection = createConnection(url, type);
+        await connection.test();
+        _dbs.set(key, await connection.connect());
     }
     return _dbs.get(key)!;
 }

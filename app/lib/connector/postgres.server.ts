@@ -39,6 +39,16 @@ export class PostgresConnection implements Connection {
 
     }
 
+    public async test(): Promise<boolean> {
+        const db = await this.connect();
+        try {
+            await db.query("SELECT 1;");
+            return true;
+        } finally {
+            await db.close();
+        }
+    }
+
     public async connect(): Promise<DB> {
         const { readonly } = this.options;
         const connectionString = this.normalizeAndValidate();

@@ -34,7 +34,6 @@ export async function loadDatasetTable(dataset: Dataset) {
 
 export function ErrorBoundary({ error }: { error: Error }) {
     console.error(error);
-
     return (
         <>
             <div className="flex min-h-screen flex-1 flex-col items-center justify-center py-4">

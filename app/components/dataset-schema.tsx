@@ -8,10 +8,10 @@ export interface DatasetSchemaProps {
 
 function List({ label, values }: { label: string, values: string[] }) {
     return (
-        <ul className="list-none prose mt-0 pl-0 block overflow-hidden overflow-x-scroll">
+        <ul className="list-none prose mt-0 pl-0 block overflow-hidden scroll-smooth hover:scroll-auto">
             <li><h3>{label}</h3></li>
-            {values.map((l) => {
-                return <li key={l} className="truncate">{l}</li>;
+            {values.map((value, index) => {
+                return <li key={index} className="truncate">{value}</li>;
             })}
         </ul>
     );
@@ -20,7 +20,7 @@ function List({ label, values }: { label: string, values: string[] }) {
 export function DatasetSchema({ schema, className }: DatasetSchemaProps) {
     if (Array.isArray(schema)) {
         return (
-            <ul className={classNames("prose", className)}>
+            <ul className={classNames("prose scroll-smooth hover:scroll-auto", className)}>
                 {schema?.map((t) => {
                     return (
                         <li key={t.name} tabIndex={0}>
@@ -43,7 +43,7 @@ export function DatasetSchema({ schema, className }: DatasetSchemaProps) {
         );
     }
     return (
-        <div className="grid grid-cols-2 gap-1">
+        <div className={classNames("grid grid-cols-2 gap-1", className)}>
             <List label="Instances" values={schema?.instances ?? []} />
             <List label="Jobs" values={schema?.jobs ?? []} />
             <List label="Labels" values={schema?.labels ?? []} />

@@ -18,6 +18,17 @@ export class PrometheusConnection implements Connection<PromSchema> {
     constructor(private readonly options: PrometheusConnectionOptions) {
     }
 
+    public async test(): Promise<boolean> {
+        const promDB = await this.connect();
+        try {
+            await promDB.getSchema();
+            return true;
+        } finally {
+            await promDB.close();
+        }
+    }
+
+
     public connect(): Promise<DB<PromSchema>> {
         const url = this.normalizeAndValidate();
         const prom = new PrometheusDriver({

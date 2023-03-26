@@ -5,11 +5,6 @@ import { useWorkspaceContext } from "~/routes/workspace";
 export default function() {
     const { schema } = useWorkspaceContext();
     return (
-        // <section className="prose mx-0 px-0 mt-2">
-        //     <h2>Schema</h2>
-        //
-        // </section>
-
         <section id="charts-grid" className="w-full overflow-hidden">
             <div className="flex justify-between mt-6">
                 <h3 className="prose text-xl flex gap-2">

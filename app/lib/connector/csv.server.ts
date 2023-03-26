@@ -1,4 +1,5 @@
 import slugify from "@sindresorhus/slugify";
+// import { constants } from "fs";
 import { minimatch } from "minimatch";
 import path from "path";
 
@@ -56,12 +57,26 @@ export class CsvConnection implements Connection {
         return normalizeFilePath;
     }
 
+    public async test(): Promise<boolean> {
+        const db = await this.connect();
+        try {
+            const [table] = await db.getSchema();
+            await db.query(`SELECT *
+                            FROM ${table.name}
+                            WHERE 1 = 0`);
+            return true;
+        } finally {
+            await db.close();
+        }
+    }
 
     public async connect(): Promise<DB> {
         const db = await new SqliteConnection({ filePath: ":memory:", readonly: false })
             .connect();
 
         const filePath = this.normalizeAndValidate();
+        // await access(filePath, constants.R_OK);
+
         const ext = path.extname(filePath) ?? "";
         const separator = extensions[ext.toLowerCase()];
 

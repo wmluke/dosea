@@ -94,6 +94,16 @@ export class SqliteConnection implements Connection {
         return normalizeFilePath;
     }
 
+    public async test(): Promise<boolean> {
+        const db = await this.connect();
+        try {
+            await db.query("SELECT 1;");
+            return true;
+        } finally {
+            await db.close();
+        }
+    }
+
     public connect(): Promise<SqliteDatabase> {
         const filePath = this.normalizeAndValidate();
         const { readonly = true } = this.options;

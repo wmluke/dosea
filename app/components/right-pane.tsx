@@ -15,18 +15,18 @@ export function RightPane({ queryResult, queryError, schema }: RightPaneProps) {
     const emptyQueryResults = !queryResult && !queryError;
 
     return (
-        <div className="flex h-[150vh] flex-col">
-            <div className={classNames("block h-[75vh] overflow-hidden", emptyQueryResults ? "hidden" : "")}>
+        <div className="flex flex-col">
+            <div className={classNames("block overflow-hidden", emptyQueryResults ? "hidden" : "")}>
                 <h3 className="prose">Query Results</h3>
                 <QueryResultsInspector
-                    className="h-full w-[300px] overflow-hidden overflow-y-auto overflow-x-auto text-sm"
+                    className="h-full w-[300px] max-h-[60vh] overflow-hidden overflow-y-auto overflow-x-auto text-sm"
                     result={queryResult}
                     error={queryError}
                 />
             </div>
-            <div className="block h-[75vh] overflow-hidden">
+            <div className="block overflow-hidden">
                 <h3 className="prose">Schema</h3>
-                <DatasetSchema schema={schema} className="h-full overflow-hidden overflow-y-auto text-sm" />
+                <DatasetSchema schema={schema} className="h-full text-sm" />
             </div>
         </div>
     );

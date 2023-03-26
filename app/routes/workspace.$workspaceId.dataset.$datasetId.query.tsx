@@ -3,7 +3,9 @@ import type { Dataset, DatasetQuery } from "@prisma/client";
 import { redirect } from "@remix-run/node";
 import { Link, Outlet } from "@remix-run/react";
 import type { ActionArgs } from "@remix-run/server-runtime";
+import type { PanelMatch } from "~/components/page-layout";
 import { QueryForm } from "~/components/query-form";
+import { RightPane } from "~/components/right-pane";
 import { SectionDropdown } from "~/components/section-dropdown";
 import { runQueryCache } from "~/lib/query.cache";
 import { saveQuery } from "~/models/query.server";
@@ -31,6 +33,16 @@ export async function action({ params, request }: ActionArgs) {
     runQueryCache.delete([queryId, datasetId].join("::"));
     return redirect(`/workspace/${workspaceId}/dataset/${datasetId}/query/${query.id}`);
 }
+
+export const handle: PanelMatch = {
+    secondaryPanelItem({ schema }) {
+        return (
+            <div className="prose">
+                <RightPane schema={schema} />
+            </div>
+        );
+    }
+};
 
 export default function DatasetExplorePage() {
     const { dataset, query } = useWorkspaceContext();
