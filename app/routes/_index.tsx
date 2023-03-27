@@ -1,6 +1,7 @@
 import type { LoaderArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { Link, useLoaderData } from "@remix-run/react";
+import { useState } from "react";
 import { getWorkspaces } from "~/models/workspace.server";
 
 export async function loader(_args: LoaderArgs) {
@@ -10,6 +11,12 @@ export async function loader(_args: LoaderArgs) {
 
 export default function _index() {
     const { workspaces } = useLoaderData<typeof loader>();
+    const [name, setName] = useState<string>();
+
+    function isFormValid() {
+        return name?.length;
+    }
+
     return (
         <div className="hero min-h-screen bg-base-200">
             <div className="hero-content text-center">
@@ -29,9 +36,11 @@ export default function _index() {
                                 <div className="form-control w-full">
                                     <div className="input-group flex justify-between w-full">
                                         <input type="text" placeholder="New Workspace..."
+                                               value={name} onChange={(e) => setName(e.target.value)}
+                                               required
                                                name="name"
                                                className="input input-bordered grow" />
-                                        <button className="btn">Go</button>
+                                        <button className="btn" disabled={!isFormValid()}>Go</button>
                                     </div>
                                 </div>
                             </form>
