@@ -1,8 +1,8 @@
-import { WorkspaceFrom } from "~/components/workspace-from";
+import { WorkspaceForm } from "~/components/workspace-form";
 
 
 export default function() {
     return (
-        <WorkspaceFrom />
+        <WorkspaceForm />
     );
 }

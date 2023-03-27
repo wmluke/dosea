@@ -3,7 +3,7 @@ import { useState } from "react";
 import type { WorkspaceInput } from "~/models/workspace.server";
 
 
-export function WorkspaceFrom({ name, id }: Partial<WorkspaceInput> & Partial<Pick<Workspace, "id">>) {
+export function WorkspaceForm({ name, id }: Partial<WorkspaceInput> & Partial<Pick<Workspace, "id">>) {
     const [name_, setName_] = useState(name);
 
     function isFormValid() {
@@ -24,7 +24,6 @@ export function WorkspaceFrom({ name, id }: Partial<WorkspaceInput> & Partial<Pi
                     <input id="input-for-dataset-name" type="text" name="name"
                            value={name_} onChange={(e) => setName_(e.target.value)}
                            required
-                           defaultValue={name}
                            placeholder="Name"
                            className="input-bordered input" />
                 </div>
