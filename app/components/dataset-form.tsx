@@ -25,7 +25,6 @@ export function DatasetForm(dataset: Partial<DatasetInput> & { workspaceId: stri
                     <input id="input-for-dataset-name" type="text" name="name"
                            value={name} onChange={(e) => setName(e.target.value)}
                            required
-                           defaultValue={dataset.name}
                            placeholder="Name"
                            className="input-bordered input" />
                 </div>
@@ -47,7 +46,6 @@ export function DatasetForm(dataset: Partial<DatasetInput> & { workspaceId: stri
                     <input id="input-for-dataset-connection" type="text" name="connection"
                            value={connection} onChange={(e) => setConnection(e.target.value)}
                            required
-                           defaultValue={dataset.connection}
                            placeholder="connection"
                            className="input-bordered input" />
                 </div>

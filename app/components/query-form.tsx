@@ -38,7 +38,6 @@ export function QueryForm({ dataset, query }: QueryFormProps) {
                     value={q}
                     onChange={(e) => setQ(e.target.value)}
                     required
-                    defaultValue={query?.query}
                     placeholder="Select * FROM..."
                 ></textarea>
             </div>
