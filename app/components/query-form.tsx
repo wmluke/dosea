@@ -78,6 +78,13 @@ export function PromQLFields({ type, queryOptionsJson }: PromQLProps) {
 
 export function QueryForm({ dataset, query }: QueryFormProps) {
     const { id, workspaceId, type } = dataset;
+
+    const [q, setQ] = useState(query?.query);
+
+    function isValid() {
+        return (q?.length ?? 0) > 0;
+    }
+
     const ql = queryLang[type] ?? "UNKNOWN";
     return (
         <form method="post" action={joinTruthy(["/workspace", workspaceId, "dataset", id, "query"], "/")}>
@@ -99,12 +106,15 @@ export function QueryForm({ dataset, query }: QueryFormProps) {
                 <textarea
                     name="q"
                     className="textarea-bordered textarea h-24"
+                    value={q}
+                    onChange={(e) => setQ(e.target.value)}
+                    required
                     defaultValue={query?.query}
                     placeholder="Select * FROM..."
                 ></textarea>
             </div>
             <div className="mt-4 flex items-center justify-between">
-                <button className="btn-primary btn-sm btn gap-2">
+                <button className="btn-primary btn-sm btn gap-2" disabled={!isValid()}>
                     <svg
                         xmlns="http://www.w3.org/2000/svg"
                         fill="none"
