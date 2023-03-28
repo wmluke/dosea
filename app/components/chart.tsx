@@ -86,8 +86,6 @@ export function transformData(data?: ChartData): DatasetOption | DatasetOption[]
 export function Chart({ data, config, width, datasetType }: ChartProps) {
     const dataset = transformData(data);
 
-    console.log(dataset);
-
     // const [row = {}] = data ?? [{}];
     // console.log("row", row);
     // const dimensions: DimensionDefinitionLoose[] = Object.entries(row).map(([name, value]) => {
