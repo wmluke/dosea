@@ -2,53 +2,8 @@ import { Client } from "pg";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { PostgresConnection } from "~/lib/connector/postgres.server";
 
+const connectionString = process.env.DOSEA_TEST_DATASET_PG;
 describe("PostgresConnection", () => {
-
-    describe("getTables", () => {
-        let client: Client;
-
-        const connectionString = process.env.DOSEA_TEST_DATASET_PG ?? "postgresql://localhost:5432/dosea_test_dataset";
-
-        beforeEach(async () => {
-            client = new Client(connectionString);
-            await client.connect();
-            await client.query(`
-                CREATE TABLE IF NOT EXISTS "Workspace"
-                (
-                    "id"        TEXT      NOT NULL PRIMARY KEY,
-                    "name"      TEXT      NOT NULL,
-                    "createdAt" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                    "updatedAt" TIMESTAMP NOT NULL
-                );
-            `);
-        });
-
-        afterEach(async () => {
-            await client.query("DROP TABLE IF EXISTS \"Workspace\";");
-            await client.end();
-        });
-
-        // skip until i provision DOSEA_TEST_DATASET_PG in GH workflow
-        it.skip("should describe db schema", async () => {
-            const connection = new PostgresConnection({
-                connectionString: connectionString,
-                readonly: true
-            });
-            const db = await connection.connect();
-            const schema = await db.getSchema();
-            expect(schema).toBeDefined();
-            expect(schema).toContainEqual({
-                name: "Workspace",
-                columns: [
-                    { name: "id", type: "text" },
-                    { name: "name", type: "text" },
-                    { name: "createdAt", type: "timestamp without time zone" },
-                    { name: "updatedAt", type: "timestamp without time zone" }
-                ]
-            });
-        });
-    });
-
 
     describe("normalizeAndValidate", () => {
 
@@ -100,6 +55,51 @@ describe("PostgresConnection", () => {
             expect(new PostgresConnection({ connectionString: "postgresql://foo/db?user=bob&password=secret" }).normalizeAndValidate())
                 .toBe("postgresql://foo/db?user=bob&password=secret");
 
+        });
+    });
+
+    describe("PostgresDB", () => {
+        describe.skipIf(!connectionString)("getSchema", () => {
+            let client: Client;
+
+
+            beforeEach(async () => {
+                client = new Client(connectionString);
+                await client.connect();
+                await client.query(`
+                CREATE TABLE IF NOT EXISTS "Workspace"
+                (
+                    "id"        TEXT      NOT NULL PRIMARY KEY,
+                    "name"      TEXT      NOT NULL,
+                    "createdAt" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                    "updatedAt" TIMESTAMP NOT NULL
+                );
+            `);
+            });
+
+            afterEach(async () => {
+                await client.query("DROP TABLE IF EXISTS \"Workspace\";");
+                await client.end();
+            });
+
+            it("should describe db schema", async () => {
+                const connection = new PostgresConnection({
+                    connectionString: connectionString!,
+                    readonly: true
+                });
+                const db = await connection.connect();
+                const schema = await db.getSchema();
+                expect(schema).toBeDefined();
+                expect(schema).toContainEqual({
+                    name: "Workspace",
+                    columns: [
+                        { name: "id", type: "text" },
+                        { name: "name", type: "text" },
+                        { name: "createdAt", type: "timestamp without time zone" },
+                        { name: "updatedAt", type: "timestamp without time zone" }
+                    ]
+                });
+            });
         });
     });
 

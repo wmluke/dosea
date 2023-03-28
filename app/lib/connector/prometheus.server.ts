@@ -24,6 +24,10 @@ export class PrometheusConnection implements Connection<PromSchema, PromQueryOpt
         try {
             await promDB.getSchema();
             return true;
+        } catch (e) {
+            console.warn("Failed to connect to prometheus");
+            console.warn(e);
+            throw e;
         } finally {
             await promDB.close();
         }

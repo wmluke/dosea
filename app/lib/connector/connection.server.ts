@@ -78,7 +78,9 @@ export async function connect(url: string, type: string): Promise<DB> {
     const key = `${type}::${url}`;
     if (!_dbs.has(key)) {
         const connection = createConnection(url, type);
-        await connection.test();
+        if (!await connection.test()) {
+            throw new Error(`Failed to connect to ${type}`);
+        }
         _dbs.set(key, await connection.connect());
     }
     return _dbs.get(key)!;
