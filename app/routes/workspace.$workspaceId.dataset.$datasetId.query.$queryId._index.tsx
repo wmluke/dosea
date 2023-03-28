@@ -7,7 +7,7 @@ import { useQueryLayoutLoaderData } from "~/routes/workspace.$workspaceId.datase
 
 export default function QueryIndexPage() {
     const data = useQueryLayoutLoaderData();
-    const { query } = useWorkspaceContext();
+    const { query, dataset } = useWorkspaceContext();
     const addChartUrl = [
         "/workspace",
         query?.dataset.workspaceId,
@@ -32,7 +32,8 @@ export default function QueryIndexPage() {
                     </Link>
                 </SectionDropdown>
             </div>
-            <ChartsGrid charts={query?.charts ?? []} queryResult={data.queryResult?.result} />
+            <ChartsGrid charts={query?.charts ?? []} queryResult={data.queryResult?.result}
+                        datasetType={dataset?.type} />
         </section>
     );
 }

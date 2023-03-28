@@ -1,4 +1,5 @@
 import { PrometheusDriver } from "prometheus-query";
+import type { QueryResult } from "prometheus-query/dist/types";
 import type { Connection, DB } from "~/lib/connector/connection.server";
 import { daysAgo } from "~/utils";
 
@@ -13,7 +14,7 @@ export interface PromSchema {
     jobs: string[];
 }
 
-export class PrometheusConnection implements Connection<PromSchema> {
+export class PrometheusConnection implements Connection<PromSchema, PromQueryOptions, QueryResult> {
 
     constructor(private readonly options: PrometheusConnectionOptions) {
     }
@@ -29,7 +30,7 @@ export class PrometheusConnection implements Connection<PromSchema> {
     }
 
 
-    public connect(): Promise<DB<PromSchema>> {
+    public connect(): Promise<DB<PromSchema, PromQueryOptions, QueryResult>> {
         const url = this.normalizeAndValidate();
         const prom = new PrometheusDriver({
             endpoint: url,
@@ -50,7 +51,51 @@ export interface PromQueryOptions {
     step?: string;
 }
 
-export class PrometheusDB implements DB<PromSchema, PromQueryOptions> {
+export interface PromResult {
+    resultType: "matrix" | "vector" | "scalar" | "string",
+    result: PromRangeVector[];
+}
+
+export interface PromRangeVector {
+    metric: {
+        name: string,
+        labels: { [key: string]: string }
+    };
+    values: TimePoint[];
+}
+
+export interface TimePoint<V = number> {
+    time: string;
+    value: V;
+}
+
+
+export function convertMatrixResultsToRows(result: PromResult): { time: string; [metric: string]: number | string }[] {
+    if (result.resultType !== "matrix") {
+        throw "Invalid result type";
+    }
+
+    const data = new Map<string, { time: string; [metric: string]: number | string }>();
+    for (const vector of result.result) {
+        const { name = "aggregation", labels } = vector.metric;
+        const { instance } = labels;
+        for (const point of vector.values) {
+            const { time, value } = point;
+            const key = [time, instance].join(":");
+
+            if (!data.has(key)) {
+                data.set(key, { time, instance });
+            }
+            const obj = data.get(key)!;
+            obj[name] = value;
+        }
+    }
+
+    return Array.from(data.values());
+
+}
+
+export class PrometheusDB implements DB<PromSchema, PromQueryOptions, QueryResult> {
 
     constructor(private readonly prom: PrometheusDriver) {
     }
@@ -75,7 +120,8 @@ export class PrometheusDB implements DB<PromSchema, PromQueryOptions> {
         return { labels, metrics, instances, jobs };
     }
 
-    public query(promQL: string, options: PromQueryOptions = {}): Promise<any> {
+    public async query(promQL: string, options: PromQueryOptions = {}): Promise<QueryResult> {
+        console.log(options);
         const { start = daysAgo(7), end = new Date(), step = "1d" } = options;
         if (start.valueOf() === end.valueOf()) {
             return this.prom.instantQuery(promQL, start);

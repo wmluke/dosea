@@ -63,7 +63,9 @@ export interface SqliteConnectionOptions {
 
 const extensions = new Set([".db", ".sqlite"]);
 
-export class SqliteConnection implements Connection {
+export type SqliteQueryResult = any[];
+
+export class SqliteConnection implements Connection<Table[], never, SqliteQueryResult> {
     constructor(private readonly options: SqliteConnectionOptions) {
     }
 
@@ -131,7 +133,7 @@ export class SqliteConnection implements Connection {
     }
 }
 
-export class SqliteDatabase implements DB {
+export class SqliteDatabase implements DB<Table[], never, SqliteQueryResult> {
     constructor(private readonly db: Database.Database) {
     }
 
@@ -168,7 +170,7 @@ export class SqliteDatabase implements DB {
         );
     }
 
-    public query(sql: string): Promise<any> {
+    public query(sql: string): Promise<SqliteQueryResult> {
         const r = this.db.prepare(sql).all();
         return Promise.resolve(r);
     }

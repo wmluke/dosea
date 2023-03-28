@@ -140,3 +140,9 @@ export function err(e: any) {
         type: e?.name ?? typeof e
     };
 }
+
+const isoDatePattern = new RegExp(/^\d{4}[-/]\d{1,2}[-/]\d{1,2}.*/);
+
+export function isISODateStringLike(s: any): boolean {
+    return typeof s === "string" && isoDatePattern.test(s);
+}

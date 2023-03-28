@@ -1,3 +1,4 @@
+import type { QueryResult, QueryResultRow } from "pg";
 import { Client, Pool } from "pg";
 import type { Connection, DB, Table } from "~/lib/connector/connection.server";
 
@@ -15,7 +16,7 @@ function createUrl(connectionString: string) {
     }
 }
 
-export class PostgresConnection implements Connection {
+export class PostgresConnection implements Connection<Table[], never, QueryResult> {
 
     constructor(private readonly options: PostgresConnectionOptions) {
     }
@@ -55,7 +56,7 @@ export class PostgresConnection implements Connection {
         }
     }
 
-    public async connect(): Promise<DB> {
+    public async connect(): Promise<DB<Table[], never, QueryResult>> {
         const { readonly } = this.options;
         const connectionString = this.normalizeAndValidate();
         const client = new Pool({
@@ -68,7 +69,7 @@ export class PostgresConnection implements Connection {
     }
 }
 
-export class PostgresDB implements DB {
+export class PostgresDB implements DB<Table[], never, QueryResult> {
 
     constructor(private readonly client: Pool) {
     }
@@ -108,9 +109,8 @@ export class PostgresDB implements DB {
         return schema;
     }
 
-    public async query(sql: string): Promise<any> {
-        const queryResult = await this.client.query(sql);
-        return queryResult.rows;
+    public query<R extends QueryResultRow = any>(sql: string): Promise<QueryResult<R>> {
+        return this.client.query(sql);
     }
 
 }

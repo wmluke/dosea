@@ -28,7 +28,7 @@ function generateCreateVSVTable({ name, filePath, separator }: { name: string, f
 
 export type CsvConnectionOptions = Omit<SqliteConnectionOptions, "readonly">;
 
-export class CsvConnection implements Connection {
+export class CsvConnection implements Connection<Table[], never, any[]> {
     constructor(
         private readonly options: CsvConnectionOptions
     ) {
@@ -70,7 +70,7 @@ export class CsvConnection implements Connection {
         }
     }
 
-    public async connect(): Promise<DB> {
+    public async connect(): Promise<DB<Table[], never, any[]>> {
         const db = await new SqliteConnection({ filePath: ":memory:", readonly: false })
             .connect();
 
@@ -92,9 +92,9 @@ export class CsvConnection implements Connection {
 }
 
 
-export class CsvDatabase implements DB {
+export class CsvDatabase implements DB<Table[], never, any[]> {
 
-    constructor(private readonly db: DB) {
+    constructor(private readonly db: DB<Table[], never, any[]>) {
     }
 
     public close(): Promise<void> {
@@ -109,7 +109,7 @@ export class CsvDatabase implements DB {
         return this.db.getSchema();
     }
 
-    public query(sql: string): Promise<any> {
+    public query(sql: string): Promise<any[]> {
         return this.db.query(sql);
     }
 

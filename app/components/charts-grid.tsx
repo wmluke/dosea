@@ -23,9 +23,10 @@ function gridItemLayout(i: number) {
 export interface ChartsGridProps<T = ChartData> {
     charts?: ConvertDatesToStrings<ChartConfig>[];
     queryResult?: T;
+    datasetType?: string;
 }
 
-export function ChartsGrid({ charts, queryResult }: ChartsGridProps) {
+export function ChartsGrid({ charts, queryResult, datasetType }: ChartsGridProps) {
 
     const children = useMemo(() => {
         return charts?.filter(Boolean).map((chart, i) => {
@@ -37,7 +38,8 @@ export function ChartsGrid({ charts, queryResult }: ChartsGridProps) {
                 >
                     <div className="card-body">
 
-                        <Chart data={queryResult ?? []} config={JSON.parse(chart!.configJson)} />
+                        <Chart data={queryResult ?? []} config={JSON.parse(chart!.configJson)}
+                               datasetType={datasetType} />
                         <div className="card-actions justify-end">
                             <Link
                                 reloadDocument

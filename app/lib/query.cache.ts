@@ -43,7 +43,7 @@ function makeQueryCache() {
     return new LRUCache<string, { result?: ChartData, error?: QueryError }>({
         max: 100,
         ttl: NO_CACHE ? 1 : (14 * 24 * 60 * 60 * 1000),
-        allowStale: !NO_CACHE,
+        allowStale: false,
         noDeleteOnFetchRejection: true,
         maxSize: 5000,
         sizeCalculation: (entry) => {
@@ -93,6 +93,18 @@ export async function loadQuery({
     return query;
 }
 
+
+function parseQueryOptionsJson(queryOptionsJson?: string | null) {
+    const obj = JSON.parse(queryOptionsJson ?? "{}");
+    if (typeof obj.start === "string") {
+        obj.start = new Date(obj.start);
+    }
+    if (typeof obj.end === "string") {
+        obj.end = new Date(obj.end);
+    }
+    return obj;
+}
+
 /**
  * Living pretty dangerously.
  * This method lacks any safeguards against SQL injection and imposes no controls on the number of query results
@@ -105,7 +117,7 @@ export async function runQueryDangerouslyAndUnsafe<T = ChartData>(query: QueryWi
     try {
         const db = await connect(query.dataset.connection, query.dataset.type);
         const start = Date.now();
-        const result = (await db.query(query.query)) as T;
+        const result = (await db.query(query.query, parseQueryOptionsJson(query.queryOptionsJson))) as T;
         const duration = Date.now() - start;
         console.log(`=> Query ${query.id} duration: ${duration / 1000}`);
         return { result };

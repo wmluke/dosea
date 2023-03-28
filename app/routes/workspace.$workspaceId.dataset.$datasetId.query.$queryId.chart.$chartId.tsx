@@ -8,6 +8,7 @@ import { loadQuery, runQuery } from "~/lib/query.cache";
 import type { ChartWithQuery } from "~/models/chartconfig.server";
 import { getChartConfigById, saveChartConfig } from "~/models/chartconfig.server";
 import type { QueryWithDatasetAndCharts } from "~/models/query.server";
+import { useWorkspaceContext } from "~/routes/workspace";
 import type { QueryPageLoaderReturn } from "~/routes/workspace.$workspaceId.dataset.$datasetId.query.$queryId";
 import { badRequest, notFound } from "~/utils";
 
@@ -73,6 +74,7 @@ function parseConfigJson(json?: string | null) {
 
 export default function ChartEditorPage() {
     const data = useLoaderData<typeof loader>() as ChartPageLoaderReturn;
+    const { dataset } = useWorkspaceContext();
     const json = data.chartConfig?.configJson ?? undefined;
     const config = parseConfigJson(json);
     return (
@@ -87,6 +89,7 @@ export default function ChartEditorPage() {
                 queryId={data.query?.id!}
                 chartId={data.chartConfig?.id}
                 config={config}
+                datasetType={dataset?.type}
             />
         </section>
     );

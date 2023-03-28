@@ -10,8 +10,14 @@ import type {
     TitleComponentOption,
     TooltipComponentOption
 } from "echarts/components";
+import { DatasetOption } from "echarts/types/dist/shared";
+import type { QueryResult as PGQueryResult } from "pg";
+import type { QueryResult as PromQueryResult } from "prometheus-query/dist/types";
+import { RangeVector, SampleValue } from "prometheus-query/dist/types";
 import { useEffect } from "react";
 import { clearTimeout } from "timers";
+import type { QueryResult } from "~/lib/connector/connection.server";
+import type { SqliteQueryResult } from "~/lib/connector/sqlite.server";
 
 export type ECOption = echarts.ComposeOption<
     | BarSeriesOption
@@ -24,7 +30,7 @@ export type ECOption = echarts.ComposeOption<
     | PieSeriesOption
 >;
 
-export type ChartData = Record<string, string | number | boolean | Date>[];
+export type ChartData = QueryResult;
 
 export interface ChartProps<T = ChartData> {
     data?: T;
@@ -32,13 +38,82 @@ export interface ChartProps<T = ChartData> {
     config?: ECOption;
 
     width?: number;
+
+    datasetType?: string;
 }
 
-export function Chart({ data, config, width }: ChartProps) {
-    const chartOptions: ECOption = {
-        dataset: {
+function isSqliteResult(data?: ChartData): data is SqliteQueryResult {
+    return Array.isArray(data);
+}
+
+function isPGResult(data?: ChartData): data is PGQueryResult {
+    return Array.isArray((data as PGQueryResult)?.rows);
+}
+
+function isPromResult(data?: ChartData): data is PromQueryResult {
+    return Array.isArray((data as PromQueryResult)?.result);
+}
+
+
+export function transformData(data?: ChartData): DatasetOption | DatasetOption[] {
+    if (isSqliteResult(data)) {
+        return {
             source: data
-        },
+        };
+    }
+    if (isPGResult(data)) {
+        return { source: data.rows };
+    }
+    if (isPromResult(data)) {
+        return data.result.map((r: RangeVector) => {
+            const { name: metric = "aggregation", labels } = r.metric;
+            const { instance } = labels as { instance: string };
+            return {
+                source: r.values.map((v: SampleValue) => {
+                    return {
+                        instance,
+                        time: v.time,
+                        [metric]: v.value
+                    };
+                })
+            };
+        });
+    }
+    return [];
+}
+
+
+export function Chart({ data, config, width, datasetType }: ChartProps) {
+    const dataset = transformData(data);
+
+    console.log(dataset);
+
+    // const [row = {}] = data ?? [{}];
+    // console.log("row", row);
+    // const dimensions: DimensionDefinitionLoose[] = Object.entries(row).map(([name, value]) => {
+    //     if (isISODateStringLike(value)) {
+    //         return {
+    //             name,
+    //             type: "time"
+    //         };
+    //     }
+    //     if (typeof value === "string") {
+    //         return {
+    //             name,
+    //             type: "ordinal"
+    //         };
+    //     }
+    //     if (typeof value === "number") {
+    //         return {
+    //             name,
+    //             type: "number"
+    //         };
+    //     }
+    //     return name;
+    // }) ?? [];
+
+    const chartOptions: ECOption = {
+        dataset,
         ...(config ?? {})
     };
     let echartRef: ReactEChartsCore | null = null;

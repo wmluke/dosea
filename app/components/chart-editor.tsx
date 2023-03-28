@@ -1,6 +1,8 @@
 import { InformationCircleIcon } from "@heroicons/react/24/solid";
 import type { ChangeEvent } from "react";
 import { useState } from "react";
+import type { FallbackProps } from "react-error-boundary";
+import { ErrorBoundary } from "react-error-boundary";
 import type { ECOption } from "~/components/chart";
 import { Chart } from "~/components/chart";
 import { isEmpty, useLocalStorage } from "~/utils";
@@ -11,6 +13,7 @@ export interface ChartEditorProps {
     queryId: string;
     chartId?: string;
     className?: string;
+    datasetType?: string;
 }
 
 const defaultConfig: ECOption = {
@@ -55,7 +58,7 @@ const defaultConfig: ECOption = {
     ]
 };
 
-export function ChartEditor({ data, config, queryId, chartId, className }: ChartEditorProps) {
+export function ChartEditor({ data, config, queryId, chartId, className, datasetType }: ChartEditorProps) {
     const key = ["chartconfig", queryId, chartId ?? "new"].join(".");
     const [chartConfig, setChartConfig] = useLocalStorage<ECOption>(
         key,
@@ -64,21 +67,39 @@ export function ChartEditor({ data, config, queryId, chartId, className }: Chart
 
     const [isValidJson, setValidJson] = useState(true);
 
+    let _resetErrorBoundary: () => void;
+
     function onChange(e: ChangeEvent<HTMLTextAreaElement>) {
         const { value } = e.target;
         try {
             setChartConfig(JSON.parse(value));
             setValidJson(true);
+            if (_resetErrorBoundary) {
+                _resetErrorBoundary();
+            }
         } catch (e) {
             console.warn(e);
             setValidJson(false);
         }
     }
 
+    function Fallback({ error, resetErrorBoundary }: FallbackProps) {
+        _resetErrorBoundary = resetErrorBoundary;
+        return (
+            <div role="alert">
+                <p>Something went wrong:</p>
+                <pre style={{ color: "red" }}>{error.message}</pre>
+            </div>
+        );
+    }
+
     return (
         <div className={className}>
             <figure className="h-[35vh]">
-                <Chart data={data} config={chartConfig}></Chart>
+                <ErrorBoundary
+                    FallbackComponent={Fallback}>
+                    <Chart data={data} config={chartConfig} datasetType={datasetType}></Chart>
+                </ErrorBoundary>
             </figure>
             <form method="post">
                 <div className="form-control">
