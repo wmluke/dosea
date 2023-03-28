@@ -1,4 +1,4 @@
-import { Pool } from "pg";
+import { Client, Pool } from "pg";
 import type { Connection, DB, Table } from "~/lib/connector/connection.server";
 
 export interface PostgresConnectionOptions {
@@ -40,12 +40,18 @@ export class PostgresConnection implements Connection {
     }
 
     public async test(): Promise<boolean> {
-        const db = await this.connect();
+        const connectionString = this.normalizeAndValidate();
+        const client = new Client({
+            connectionString,
+            application_name: "dosea",
+            options: "-c default_transaction_read_only=on"
+        });
         try {
-            await db.query("SELECT 1;");
+            await client.connect();
+            await client.query("SELECT 1;");
             return true;
         } finally {
-            await db.close();
+            await client.end();
         }
     }
 
@@ -78,7 +84,7 @@ export class PostgresDB implements DB {
     public async getSchema(): Promise<Table[]> {
         const res = await this.client.query(`
             SELECT table_name
-            FROM information_schema.schema
+            FROM information_schema.tables
             WHERE table_schema = 'public';
         `);
         const schema: Table[] = [];
