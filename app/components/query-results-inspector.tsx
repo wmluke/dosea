@@ -1,6 +1,7 @@
+import { QueryResult } from "~/lib/connector/connection.server";
 import { classNames } from "~/utils";
 
-export interface QueryResultsInspectorProps<T = Array<Record<string, any>>> {
+export interface QueryResultsInspectorProps<T = QueryResult> {
     result?: T | null;
     error?: Object;
     className?: string;
