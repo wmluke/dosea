@@ -18,6 +18,7 @@ export type PanelMatch = {
     primaryPanelItem?: PanelItem,
     secondaryPanelItem?: PanelItem,
     primaryDrawerOpen?: boolean,
+    hidePrimaryDrawer?: boolean
 };
 
 export const PageLayoutContext = createContext<ConvertDatesToStrings<WorkspaceContext>>({});
@@ -61,6 +62,24 @@ export function PageLayout({
     const secondaryPanelContent = renderPanelContent(secondaryPanelItems, { workspace, dataset, query, schema });
 
     const openDrawer = matches[matches.length - 1]?.handle?.primaryDrawerOpen ?? false;
+    const hidePrimaryDrawer = matches[matches.length - 1]?.handle?.hidePrimaryDrawer ?? false;
+
+    if (hidePrimaryDrawer) {
+        return (
+            <PageLayoutContext.Provider value={{ workspace, dataset, query, schema }}>
+                <SecondaryDrawer
+                    drawerSideContent={
+                        <div className="flex h-[150vh] flex-col p-4 w-80 bg-base-200 text-base-content">
+                            {secondaryPanelContent}
+                        </div>
+                    }>
+                    <TopNavbar workspace={workspace} showBackButton={true} />
+                    {children}
+                </SecondaryDrawer>
+            </PageLayoutContext.Provider>
+        );
+    }
+
     return (
         <PageLayoutContext.Provider value={{ workspace, dataset, query, schema }}>
             <PrimaryDrawer
@@ -73,7 +92,7 @@ export function PageLayout({
                             {secondaryPanelContent}
                         </div>
                     }>
-                    <TopNavbar workspace={workspace} />
+                    <TopNavbar workspace={workspace} showBackButton={false} />
                     {children}
                 </SecondaryDrawer>
             </PrimaryDrawer>

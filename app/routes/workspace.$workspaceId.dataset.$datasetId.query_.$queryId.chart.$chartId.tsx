@@ -4,6 +4,8 @@ import { json, redirect } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 import type { ActionArgs } from "@remix-run/server-runtime";
 import { ChartEditor } from "~/components/chart-editor";
+import { PanelMatch } from "~/components/page-layout";
+import { RightPane } from "~/components/right-pane";
 import { loadQuery, runQuery } from "~/lib/query.cache";
 import type { ChartWithQuery } from "~/models/chartconfig.server";
 import { getChartConfigById, saveChartConfig } from "~/models/chartconfig.server";
@@ -71,6 +73,18 @@ function parseConfigJson(json?: string | null) {
         return;
     }
 }
+
+export const handle: PanelMatch = {
+    hidePrimaryDrawer: true,
+    secondaryPanelItem({ match, schema }) {
+        const { queryResult } = match.data as QueryPageLoaderReturn;
+        return (
+            <div className="prose">
+                <RightPane queryResult={queryResult.result} queryError={queryResult.error} schema={schema} />
+            </div>
+        );
+    }
+};
 
 export default function ChartEditorPage() {
     const data = useLoaderData<typeof loader>() as ChartPageLoaderReturn;
