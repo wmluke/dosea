@@ -17,6 +17,7 @@ import type {
 } from "echarts/components";
 import { useEffect } from "react";
 import { clearTimeout } from "timers";
+import { useEventListener } from "usehooks-ts";
 import type { ChartFormValues } from "~/components/chart/chart-editor";
 import type { Field } from "~/components/chart/chart-utils";
 import {
@@ -67,13 +68,31 @@ export function Chart({ data, config, fields, width }: ChartProps) {
 
     let echartRef: ReactEChartsCore | null = null;
 
+    function handleResize() {
+        const echartsInstance = echartRef?.getEchartsInstance();
+        if (!echartsInstance) {
+            return;
+        }
+        const legendComponent = (echartsInstance as any)._componentsViews
+            .find((entry: any) => entry.type === "legend.plain");
+        const legendHeight = legendComponent._backgroundEl.shape.height;
+        if (legendHeight) {
+            echartsInstance.setOption({
+                grid: {
+                    bottom: legendHeight + 50
+                }
+            });
+        }
+        echartsInstance?.resize();
+    }
+
+    useEventListener("resize", handleResize);
+
     // kind of lame, but need to resize chart for proper
     // sizing in inside grid react-grid-layout.
     // will likely need to revisit this
     useEffect(() => {
-        const timeout = setTimeout(() => {
-            echartRef?.getEchartsInstance().resize();
-        });
+        const timeout = setTimeout(handleResize);
         return () => {
             clearTimeout(timeout);
         };

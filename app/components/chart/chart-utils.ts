@@ -176,7 +176,7 @@ export function createEChartConfig(chartFormValues: ChartFormValues, fields: Fie
 
     const legend: ECOption["legend"] = {
         show: chartFormValues.legend.enabled,
-        orient: "vertical"
+        bottom: 0
     };
 
     const tooltip: ECOption["tooltip"] = {
@@ -187,7 +187,11 @@ export function createEChartConfig(chartFormValues: ChartFormValues, fields: Fie
         }
     };
 
-    return { title, legend, tooltip, xAxis, yAxis, series };
+    const grid: ECOption["grid"] = {
+        // bottom: 125,
+    };
+
+    return { title, legend, tooltip, xAxis, yAxis, series, grid };
 }
 
 function getFirst<T>(itemOrItems: T | T[]): T {

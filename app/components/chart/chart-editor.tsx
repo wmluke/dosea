@@ -277,8 +277,8 @@ export function ChartEditorForm({ fields, chartConfig, onChange }: ChartEditorFo
                 <form onSubmit={handleSubmit(onSubmit)}>
                     <ChartTypeFormSection register={register} />
                     <SeriesFormSection register={register} fields={fields} />
-                    <AxisFormSection />
                     <TitleFormSection />
+                    <AxisFormSection />
                     <FormSection heading="Legend">
                         <Checkbox label="Enabled" name="legend.enabled" register={register} />
                     </FormSection>
