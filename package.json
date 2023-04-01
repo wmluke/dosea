@@ -10,7 +10,6 @@
     "dev": "run-p dev:*",
     "dev:css": "npm run generate:css -- --watch",
     "dev:remix": "cross-env NODE_ENV=development binode --require ./mocks -- @remix-run/dev:remix dev",
-    "dev:svg": "run-s icons icons:watch",
     "icons": "npx @svgr/cli --out-dir app/components/icons -- icons",
     "icons:watch": "npm-watch icons",
     "format": "prettier --write .",

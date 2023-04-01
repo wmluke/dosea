@@ -12,7 +12,6 @@ node_modules
 /prisma/data.db-wal
 
 /app/styles/app.css
-/app/components/icons
 
 .idea
 /coverage
