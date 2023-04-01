@@ -10,10 +10,13 @@ import { CHARTFORMVALUES_SCHEMA_VERSION } from "~/components/chart/chart-editor"
 import type { SqliteQueryResult } from "~/lib/connector/sqlite.server";
 import { isISODateStringLike } from "~/utils";
 
+export type ResultType = "pg-query" | "sqlite-query" | "prom-query";
+
 export interface Field extends DimensionDefinition {
     id: string;
     labels?: { [l: string]: string };
     datasetIndex: number;
+    resultType: ResultType;
 }
 
 export type ChartType = "bar" | "line" | "pie" | "scatter" | "radar";
@@ -49,7 +52,7 @@ export function createEChartDataset(data?: ChartData): DatasetOption | DatasetOp
                         instance,
                         metric,
                         time: v.time,
-                        [`${metric}:${instance}`]: v.value
+                        [promFieldName({ metric, instance })]: v.value
                     };
                 })
             };
@@ -60,51 +63,59 @@ export function createEChartDataset(data?: ChartData): DatasetOption | DatasetOp
 }
 
 
-function inspectFirstRow(row: Object = {}): Field[] {
+function inspectFirstRow(row: Object = {}, resultType: ResultType): Field[] {
     const datasetIndex = 0;
-    return Object.entries(row).map(([name, value], idx) => {
+    const entryToField = ([name, value]: [string, string], idx: number): Field => {
         const id = idx + "";
         if (isISODateStringLike(value)) {
-            return { id, name, datasetIndex, type: "time" };
+            return { id, name, datasetIndex, type: "time", resultType };
         }
         if (typeof value === "string") {
-            return { id, name, datasetIndex, type: "ordinal" };
+            return { id, name, datasetIndex, type: "ordinal", resultType };
         }
         if (typeof value === "number") {
-            return { id, name, datasetIndex, type: "number" };
+            return { id, name, datasetIndex, type: "number", resultType };
         }
-        return { id, name, datasetIndex };
-    }) ?? [];
+        return { id, name, datasetIndex, resultType };
+    };
+    return Object.entries(row).map(entryToField) ?? [];
+}
+
+function promFieldName({ metric, instance }: { metric: string, instance: string }): string {
+    return `${metric} ${instance}`;
 }
 
 export function createFields(data?: ChartData): Field[] {
     if (isSqliteResult(data)) {
-        return inspectFirstRow(data[0]);
+        return inspectFirstRow(data[0], "sqlite-query");
     }
     if (isPGResult(data)) {
-        return inspectFirstRow(data.rows[0]);
+        return inspectFirstRow(data.rows[0], "pg-query");
     }
     if (isPromResult(data)) {
-        const fields: Field[] = data.result.map((r: RangeVector, index) => {
+        const resultType: ResultType = "prom-query";
+        const fields: Field[] = data.result.map((r: RangeVector, index): Field => {
             const { name: metric = "aggregation", labels } = r.metric;
             const { instance } = labels as Field["labels"] ?? {};
-            const { type } = inspectFirstRow(r.values[0])[1];
+            const { type } = inspectFirstRow(r.values[0], resultType)[1];
             return {
                 id: (index + 1) + "",
-                name: `${metric}:${instance}`,
+                name: promFieldName({ metric, instance }),
                 type,
                 labels: {
                     metric,
                     ...labels
                 },
-                datasetIndex: index
+                datasetIndex: index,
+                resultType
             };
         });
         fields.unshift({
             id: "0",
             name: "time",
             type: "time",
-            datasetIndex: -1
+            datasetIndex: -1,
+            resultType
         });
         return fields;
     }

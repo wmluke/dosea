@@ -120,38 +120,37 @@ function SeriesFormSection({ fields, register }: SeriesFormSectionProps) {
 
     return (
         <FormSection heading="Series">
-            <table className="table table-compact w-full">
+            <table className="table table-compact table-fixed w-full">
                 <thead>
                 <tr>
-                    <th>Name</th>
-                    <th>Labels</th>
-                    <th>Type</th>
-                    <th>X-Axis</th>
-                    <th>Y-Axis</th>
+                    <th className="max-w-[100px]">Name</th>
+                    <th className="hidden md:table-cell">Type</th>
+                    <th className="text-center w-[70px]">X-Axis</th>
+                    <th className="text-center w-[70px]">Y-Axis</th>
                 </tr>
                 </thead>
                 <tbody>
                 {fields.map((f, idx) => {
                     return (
                         <tr key={idx} className="">
-                            <td className="align-top">{f.name}</td>
-                            <td className="align-top">
-                                <ul>
+                            <td className="align-top truncate">
+                                <span>{f.name}</span>
+                                <ul className="w-full">
                                     {Object.entries(f.labels ?? {}).map(([l, v], i) => {
                                         return (
-                                            <li key={i}>{`${l} = ${v}`}</li>
+                                            <li className="w-full truncate" key={i}>{`${l} = ${v}`}</li>
                                         );
                                     })}
                                 </ul>
                             </td>
-                            <td className="align-top">{f.type}</td>
-                            <td>
+                            <td className="align-top hidden md:table-cell">{f.type}</td>
+                            <td className="text-center">
                                 <input type="radio" className="radio radio-primary"
                                        value={idx + ""}
                                        {...register("xAxis.fieldId")}
                                 />
                             </td>
-                            <td>
+                            <td className="text-center">
                                 <input type="checkbox" className="checkbox checkbox-primary"
                                        value={idx + ""}
                                        {...register("yAxis.fieldIds")}
@@ -273,7 +272,7 @@ export function ChartEditorForm({ fields, chartConfig, onChange }: ChartEditorFo
 
 
     return (
-        <div className="mx-4 grid grid-cols-1 divide-y divide-neutral-800 gap-2">
+        <div className="grid grid-cols-1 divide-y divide-neutral-800 gap-2">
             <FormProvider {...methods} >
                 <form onSubmit={handleSubmit(onSubmit)}>
                     <ChartTypeFormSection register={register} />
