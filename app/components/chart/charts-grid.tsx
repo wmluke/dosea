@@ -44,13 +44,13 @@ export function ChartsGrid({ charts, queryResult, datasetType }: ChartsGridProps
                             <Link
                                 reloadDocument
                                 to={joinTruthy(["chart", chart!.id], "/")}
-                                className="btn-secondary btn-xs btn"
+                                className="btn-secondary btn-sm btn"
                             >
                                 Edit
                             </Link>
                             <Link
                                 to={joinTruthy(["chart", chart!.id, "delete"], "/")}
-                                className="btn-info btn-xs btn"
+                                className="btn-info btn-sm btn"
                             >
                                 Delete
                             </Link>
@@ -65,6 +65,7 @@ export function ChartsGrid({ charts, queryResult, datasetType }: ChartsGridProps
         rowHeight={500}
         breakpoints={{ lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 }}
         cols={{ lg: 3, md: 2, sm: 2, xs: 2, xxs: 2 }}
+        isDraggable={false}
     >
         {children}
     </ResponsiveGridLayout>;
