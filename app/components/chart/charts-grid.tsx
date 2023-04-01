@@ -59,7 +59,7 @@ export function ChartsGrid({ charts, queryResult, datasetType }: ChartsGridProps
                 </div>
             );
         });
-    }, [charts, queryResult]);
+    }, [charts, datasetType, queryResult]);
 
     return <ResponsiveGridLayout
         rowHeight={500}

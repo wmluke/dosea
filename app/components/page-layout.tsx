@@ -44,6 +44,7 @@ export function PageLayout({
                                workspace,
                                dataset,
                                query,
+                               queryResult,
                                schema
                            }: PageLayoutProps & ConvertDatesToStrings<WorkspaceContext>) {
     const primaryPanelItems: [PanelItem, RouteMatch][] = [];
@@ -58,15 +59,27 @@ export function PageLayout({
             secondaryPanelItems.push([secondaryPanelItem, match]);
         }
     }
-    const primaryPanelContent = renderPanelContent(primaryPanelItems, { workspace, dataset, query, schema });
-    const secondaryPanelContent = renderPanelContent(secondaryPanelItems, { workspace, dataset, query, schema });
+    const primaryPanelContent = renderPanelContent(primaryPanelItems, {
+        workspace,
+        dataset,
+        query,
+        queryResult,
+        schema
+    });
+    const secondaryPanelContent = renderPanelContent(secondaryPanelItems, {
+        workspace,
+        dataset,
+        query,
+        queryResult,
+        schema
+    });
 
     const openDrawer = matches[matches.length - 1]?.handle?.primaryDrawerOpen ?? false;
     const hidePrimaryDrawer = matches[matches.length - 1]?.handle?.hidePrimaryDrawer ?? false;
 
     if (hidePrimaryDrawer) {
         return (
-            <PageLayoutContext.Provider value={{ workspace, dataset, query, schema }}>
+            <PageLayoutContext.Provider value={{ workspace, dataset, query, schema, queryResult }}>
                 <SecondaryDrawer
                     drawerSideContent={
                         <div className="flex h-[150vh] flex-col p-4 w-80 bg-base-200 text-base-content">
@@ -81,7 +94,7 @@ export function PageLayout({
     }
 
     return (
-        <PageLayoutContext.Provider value={{ workspace, dataset, query, schema }}>
+        <PageLayoutContext.Provider value={{ workspace, dataset, query, queryResult, schema }}>
             <PrimaryDrawer
                 open={openDrawer}
                 drawerSideContent={primaryPanelContent}

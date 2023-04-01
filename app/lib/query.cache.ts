@@ -1,5 +1,6 @@
 import LRUCache from "lru-cache";
 import type { ChartData } from "~/components/chart/chart";
+import type { QueryResult } from "~/lib/connector/connection.server";
 import { connect } from "~/lib/connector/connection.server";
 import type { QueryWithDatasetAndCharts } from "~/models/query.server";
 import { getQueryById } from "~/models/query.server";
@@ -110,7 +111,10 @@ function parseQueryOptionsJson(queryOptionsJson?: string | null) {
  * This method lacks any safeguards against SQL injection and imposes no controls on the number of query results
  * TODO: At a minimum: sanitize and validate "sql" input and inject query limits
  */
-export async function runQueryDangerouslyAndUnsafe<T = ChartData>(query: QueryWithDatasetAndCharts): Promise<{ result?: T, error?: QueryError }> {
+export async function runQueryDangerouslyAndUnsafe<T = ChartData>(query: QueryWithDatasetAndCharts): Promise<{
+    result?: T,
+    error?: QueryError
+}> {
     if (!query) {
         return { error: { message: "No query" } };
     }
@@ -128,12 +132,17 @@ export async function runQueryDangerouslyAndUnsafe<T = ChartData>(query: QueryWi
     }
 }
 
+export type QueryResultWithError = {
+    result?: QueryResult;
+    error?: QueryError;
+};
+
 export async function runQuery({
                                    queryId,
                                    datasetId
                                }: {
     queryId?: string;
     datasetId?: string;
-}) {
-    return runQueryCache.fetch([queryId, datasetId].join("::"));
+}): Promise<QueryResultWithError> {
+    return runQueryCache.fetch([queryId, datasetId].join("::")) as any;
 }

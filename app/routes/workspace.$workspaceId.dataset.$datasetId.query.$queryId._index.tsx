@@ -3,11 +3,9 @@ import { Link } from "@remix-run/react";
 import { ChartsGrid } from "~/components/chart/charts-grid";
 import { SectionDropdown } from "~/components/section-dropdown";
 import { useWorkspaceContext } from "~/routes/workspace";
-import { useQueryLayoutLoaderData } from "~/routes/workspace.$workspaceId.dataset.$datasetId.query.$queryId";
 
 export default function QueryIndexPage() {
-    const data = useQueryLayoutLoaderData();
-    const { query, dataset } = useWorkspaceContext();
+    const { query, queryResult, dataset } = useWorkspaceContext();
     const addChartUrl = [
         "/workspace",
         query?.dataset.workspaceId,
@@ -32,7 +30,7 @@ export default function QueryIndexPage() {
                     </Link>
                 </SectionDropdown>
             </div>
-            <ChartsGrid charts={query?.charts ?? []} queryResult={data.queryResult?.result}
+            <ChartsGrid charts={query?.charts ?? []} queryResult={queryResult?.result}
                         datasetType={dataset?.type} />
         </section>
     );

@@ -17,7 +17,15 @@ import type {
 } from "echarts/components";
 import { useEffect } from "react";
 import { clearTimeout } from "timers";
-import { transformData } from "~/components/chart/chart-utils";
+import type { ChartFormValues } from "~/components/chart/chart-editor";
+import type { Field } from "~/components/chart/chart-utils";
+import {
+    createDefaultChartFormValues,
+    createEChartConfig,
+    createEChartDataset,
+    createFields,
+    normalizeChartConfig
+} from "~/components/chart/chart-utils";
 import type { QueryResult } from "~/lib/connector/connection.server";
 
 export type ECOption = echarts.ComposeOption<
@@ -38,7 +46,9 @@ export type ChartData = QueryResult;
 export interface ChartProps<T = ChartData> {
     data?: T;
 
-    config?: ECOption;
+    fields?: Field[];
+
+    config?: ChartFormValues | ECOption;
 
     width?: number;
 
@@ -46,12 +56,12 @@ export interface ChartProps<T = ChartData> {
 }
 
 
-export function Chart({ data, config, width, datasetType }: ChartProps) {
-    const dataset = transformData(data);
-    const chartOptions: ECOption = {
-        dataset,
-        ...(config ?? {})
-    };
+export function Chart({ data, config, fields, width }: ChartProps) {
+    const f = fields ?? createFields(data);
+    const c = normalizeChartConfig(config);
+    const chartOptions: ECOption = createEChartConfig(c ??
+        createDefaultChartFormValues(f), f);
+    chartOptions.dataset = createEChartDataset(data);
 
     //console.log(chartOptions);
 

@@ -30,7 +30,7 @@ export function isPromResult(data?: ChartData): data is PromQueryResult {
     return Array.isArray((data as PromQueryResult)?.result);
 }
 
-export function transformData(data?: ChartData): DatasetOption | DatasetOption[] {
+export function createEChartDataset(data?: ChartData): DatasetOption | DatasetOption[] {
     if (isSqliteResult(data)) {
         return {
             source: data
@@ -49,7 +49,7 @@ export function transformData(data?: ChartData): DatasetOption | DatasetOption[]
                         instance,
                         metric,
                         time: v.time,
-                        [instance]: v.value
+                        [`${metric}:${instance}`]: v.value
                     };
                 })
             };
@@ -86,15 +86,15 @@ export function createFields(data?: ChartData): Field[] {
     }
     if (isPromResult(data)) {
         const fields: Field[] = data.result.map((r: RangeVector, index) => {
-            const { name = "aggregation", labels } = r.metric;
+            const { name: metric = "aggregation", labels } = r.metric;
             const { instance } = labels as Field["labels"] ?? {};
             const { type } = inspectFirstRow(r.values[0])[1];
             return {
                 id: (index + 1) + "",
-                name: instance,
+                name: `${metric}:${instance}`,
                 type,
                 labels: {
-                    metric: name,
+                    metric,
                     ...labels
                 },
                 datasetIndex: index
@@ -126,7 +126,7 @@ function toAxisType(type?: DataStoreDimensionType): OptionAxisType {
 export function createEChartConfig(chartFormValues: ChartFormValues, fields: Field[]): ECOption {
     const xAxisField = fields[Number(chartFormValues.xAxis.fieldId)] ?? {};
     const series: ECOption["series"] = chartFormValues.yAxis.fieldIds.map((id) => {
-        const field = fields[Number(id)];
+        const field = fields[Number(id)] ?? {};
         return {
             type: chartFormValues.chartType,
             datasetIndex: field.datasetIndex,
@@ -218,11 +218,46 @@ export function createChartFormValues(echartOptions: ECOption): ChartFormValues 
 
     const yAxis: ChartFormValues["yAxis"] = {
         label: ecYAxis?.name ?? "y-axis",
-        fieldIds: Array.from({ length: ecSeries.length - 1 }, (_, i) => (i + 1) + "")
+        fieldIds: Array.from({ length: ecSeries.length }, (_, i) => (i + 1) + "")
     };
 
     const version = CHARTFORMVALUES_SCHEMA_VERSION;
 
     return { version, chartType, title, legend, tooltip, xAxis, yAxis };
 
+}
+
+export function createDefaultChartFormValues(fields: Field[]): ChartFormValues {
+    const xAxisField = fields.find(f => f.type === "time") ?? fields[0] ?? {};
+    return {
+        version: CHARTFORMVALUES_SCHEMA_VERSION,
+        chartType: "line",
+        title: {
+            enabled: true,
+            title: "Chart Title",
+            subtitle: "Chart Subtitle"
+        },
+        xAxis: {
+            label: "x-axis",
+            fieldId: xAxisField.id
+        },
+        yAxis: {
+            label: "y-axis",
+            fieldIds: fields.map(f => f.id).filter(id => id !== xAxisField.id)
+        },
+        tooltip: {
+            enabled: true
+        },
+        legend: {
+            enabled: true
+        }
+    };
+}
+
+function isChartFromValues(config?: ChartFormValues | ECOption): config is ChartFormValues {
+    return (config as ChartFormValues)?.version > 0;
+}
+
+export function normalizeChartConfig(config?: ChartFormValues | ECOption) {
+    return isChartFromValues(config) ? config : createChartFormValues(config ?? {});
 }

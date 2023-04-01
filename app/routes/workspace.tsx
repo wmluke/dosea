@@ -6,6 +6,8 @@ import { LeftNav } from "~/components/left-nav";
 import type { PanelMatch } from "~/components/page-layout";
 import { PageLayout, usePageLayoutContext } from "~/components/page-layout";
 import type { Schema } from "~/lib/connector/connection.server";
+import type { QueryResultWithError } from "~/lib/query.cache";
+import { runQuery } from "~/lib/query.cache";
 import type { DatasetWithQueries } from "~/models/dataset.server";
 import { getDatasetById } from "~/models/dataset.server";
 import type { QueryWithDatasetAndCharts } from "~/models/query.server";
@@ -32,6 +34,7 @@ export interface WorkspaceContext {
     dataset?: DatasetWithQueries | null;
     schema?: Schema;
     query?: QueryWithDatasetAndCharts;
+    queryResult?: QueryResultWithError;
 }
 
 export function useWorkspaceContext() {
@@ -66,6 +69,7 @@ export async function loader({ params }: LoaderArgs) {
             throw notFound("Query");
         }
         context.query = query;
+        context.queryResult = await runQuery({ queryId, datasetId }) as any;
     }
     return json(context);
 }
@@ -85,10 +89,11 @@ export default function WorkspacePage() {
         workspace,
         dataset,
         query,
-        schema
+        schema,
+        queryResult
     } = useLoaderData<typeof loader>() as ConvertDatesToStrings<WorkspaceContext>;
     return (
-        <PageLayout workspace={workspace} dataset={dataset} query={query} schema={schema}>
+        <PageLayout workspace={workspace} dataset={dataset} query={query} queryResult={queryResult} schema={schema}>
             <Outlet />
         </PageLayout>
     );

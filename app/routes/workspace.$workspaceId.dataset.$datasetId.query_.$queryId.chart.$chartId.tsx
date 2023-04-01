@@ -6,22 +6,19 @@ import type { ActionArgs } from "@remix-run/server-runtime";
 import { ChartEditor } from "~/components/chart/chart-editor";
 import type { PanelMatch } from "~/components/page-layout";
 import { RightPane } from "~/components/right-pane";
-import { loadQuery, runQuery } from "~/lib/query.cache";
+import { loadQuery } from "~/lib/query.cache";
 import type { ChartWithQuery } from "~/models/chartconfig.server";
 import { getChartConfigById, saveChartConfig } from "~/models/chartconfig.server";
-import type { QueryWithDatasetAndCharts } from "~/models/query.server";
 import { useWorkspaceContext } from "~/routes/workspace";
-import type { QueryPageLoaderReturn } from "~/routes/workspace.$workspaceId.dataset.$datasetId.query.$queryId";
 import { badRequest, notFound } from "~/utils";
 
 
-export interface ChartPageLoaderReturn extends QueryPageLoaderReturn {
+export interface ChartPageLoaderReturn {
     chartConfig: ChartWithQuery;
-    query: QueryWithDatasetAndCharts;
 }
 
 export async function loader({ params }: LoaderArgs) {
-    const { datasetId, queryId, chartId } = params;
+    const { queryId, chartId } = params;
     if (!chartId) {
         throw notFound();
     }
@@ -37,11 +34,7 @@ export async function loader({ params }: LoaderArgs) {
         throw badRequest();
     }
 
-    const query = await loadQuery({ queryId, datasetId });
-    const queryResult = await runQuery({ queryId, datasetId }) as any;
-
-    const returnValue: ChartPageLoaderReturn = { chartConfig, query, queryResult };
-    return json(returnValue);
+    return json({ chartConfig });
 }
 
 export async function action({ params, request }: ActionArgs) {
@@ -76,11 +69,10 @@ function parseConfigJson(json?: string | null) {
 
 export const handle: PanelMatch = {
     hidePrimaryDrawer: true,
-    secondaryPanelItem({ match, schema }) {
-        const { queryResult } = match.data as QueryPageLoaderReturn;
+    secondaryPanelItem({ queryResult, schema }) {
         return (
             <div className="prose">
-                <RightPane queryResult={queryResult.result} queryError={queryResult.error} schema={schema} />
+                <RightPane queryResult={queryResult?.result} queryError={queryResult?.error} schema={schema} />
             </div>
         );
     }
@@ -88,6 +80,8 @@ export const handle: PanelMatch = {
 
 export default function ChartEditorPage() {
     const data = useLoaderData<typeof loader>() as ChartPageLoaderReturn;
+    const { query, queryResult } = useWorkspaceContext();
+
     const { dataset } = useWorkspaceContext();
     const json = data.chartConfig?.configJson ?? undefined;
     const config = parseConfigJson(json);
@@ -99,8 +93,8 @@ export default function ChartEditorPage() {
             </h3>
             <ChartEditor
                 className="w-full"
-                data={data.queryResult?.result ?? []}
-                queryId={data.query?.id!}
+                data={queryResult?.result ?? []}
+                queryId={query?.id!}
                 chartId={data.chartConfig?.id}
                 config={config}
                 datasetType={dataset?.type}

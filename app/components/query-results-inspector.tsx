@@ -1,4 +1,4 @@
-import { QueryResult } from "~/lib/connector/connection.server";
+import type { QueryResult } from "~/lib/connector/connection.server";
 import { classNames } from "~/utils";
 
 export interface QueryResultsInspectorProps<T = QueryResult> {

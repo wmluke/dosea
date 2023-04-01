@@ -1,19 +1,17 @@
-import { InformationCircleIcon } from "@heroicons/react/24/solid";
-import type { ChangeEvent, ReactNode } from "react";
+import type { ReactNode } from "react";
 import { useEffect, useState } from "react";
 import type { FallbackProps } from "react-error-boundary";
 import { ErrorBoundary } from "react-error-boundary";
 import type { UseFormRegister } from "react-hook-form";
 import { FormProvider, useForm, useFormContext } from "react-hook-form";
 import type { FieldPath } from "react-hook-form/dist/types/path";
-import type { ChartData, ECOption } from "~/components/chart/chart";
+import type { ECOption } from "~/components/chart/chart";
 import { Chart } from "~/components/chart/chart";
 import type { ChartType, Field } from "~/components/chart/chart-utils";
-import { createEChartConfig, createFields } from "~/components/chart/chart-utils";
+import { createDefaultChartFormValues, createFields, normalizeChartConfig } from "~/components/chart/chart-utils";
 import SvgBar from "~/components/icons/bar";
 import SvgLine from "~/components/icons/line";
 import SvgScatter from "~/components/icons/scatter";
-import { classNames, isEmpty, useLocalStorage } from "~/utils";
 
 
 const chartTypes: { type: ChartType, icon: ReactNode }[] = [
@@ -239,50 +237,26 @@ function Checkbox({ name, label, register }: CheckboxProps) {
     );
 }
 
+
 export interface ChartEditorFormProps {
-    data: ChartData;
-    onChange: (c: ECOption) => void;
+    fields: Field[],
+    chartConfig?: ChartFormValues;
+    onChange: (c: ChartFormValues) => void;
 }
 
-
-export function ChartEditorForm({ data, onChange }: ChartEditorFormProps) {
-    const fields = createFields(data);
-    const xAxisField = fields.find(f => f.type === "time") ?? fields[0] ?? {};
-
-    const initialChartConfig: ChartFormValues = {
-        version: CHARTFORMVALUES_SCHEMA_VERSION,
-        chartType: "line",
-        title: {
-            enabled: true,
-            title: "Chart Title",
-            subtitle: "Chart Subtitle"
-        },
-        xAxis: {
-            label: "x-axis",
-            fieldId: xAxisField.id
-        },
-        yAxis: {
-            label: "y-axis",
-            fieldIds: fields.map(f => f.id).filter(id => id !== xAxisField.id)
-        },
-        tooltip: {
-            enabled: true
-        },
-        legend: {
-            enabled: true
-        }
-    };
-
+export function ChartEditorForm({ fields, chartConfig, onChange }: ChartEditorFormProps) {
     const methods = useForm({
         mode: "onChange",
-        defaultValues: initialChartConfig
+        defaultValues: chartConfig ?? createDefaultChartFormValues(fields)
     });
     const { register, handleSubmit, watch, setValue } = methods;
 
 
     const onSubmit = (data: ChartFormValues) => {
-        onChange(createEChartConfig(data, fields));
+        onChange(data);
     };
+
+    const formValues = watch();
 
     useEffect(() => {
         const { unsubscribe } = watch((data) => {
@@ -292,7 +266,7 @@ export function ChartEditorForm({ data, onChange }: ChartEditorFormProps) {
                 const ids = yAxisFieldIds.filter(id => id !== xAxisFieldId) ?? [];
                 setValue("yAxis.fieldIds", ids as string[]);
             }
-            onChange(createEChartConfig(data as ChartFormValues, fields));
+            onChange(data as ChartFormValues);
         });
         return () => unsubscribe();
     }, [watch, onChange, fields, setValue]);
@@ -314,70 +288,10 @@ export function ChartEditorForm({ data, onChange }: ChartEditorFormProps) {
                     </FormSection>
                 </form>
             </FormProvider>
-        </div>
-    );
-}
-
-export interface ChartEditorJsonFormProps {
-    config?: ECOption;
-    queryId: string;
-    chartId?: string;
-    resetErrorBoundary?: () => void;
-
-}
-
-export function ChartEditorJsonForm({ config, queryId, chartId, resetErrorBoundary }: ChartEditorJsonFormProps) {
-    const key = ["chartconfig", queryId, chartId ?? "new"].join(".");
-    const [chartConfig, setChartConfig] = useLocalStorage<ECOption>(
-        key,
-        isEmpty(config) ? {} : config!
-    );
-
-    const [isValidJson, setValidJson] = useState(true);
-
-    function onChange(e: ChangeEvent<HTMLTextAreaElement>) {
-        const { value } = e.target;
-        try {
-            setChartConfig(JSON.parse(value));
-            setValidJson(true);
-            if (resetErrorBoundary) {
-                resetErrorBoundary();
-            }
-        } catch (e) {
-            console.warn(e);
-            setValidJson(false);
-        }
-    }
-
-    return (
-        <div className="mx-4">
             <form method="post">
-                <div className="form-control">
-                    <label className="label">
-                        <span className="label-text">Chart Config</span>
-                        <span className="label-text-alt">
-                            <a className="flex gap-1"
-                               href="https://echarts.apache.org/en/option.html"
-                               target="_blank" rel="noreferrer">
-                            <InformationCircleIcon className="h-6 w-6" />
-                            ECharts Config
-                        </a>
-                        </span>
-                    </label>
-                    <textarea
-                        name="configJson"
-                        className={`textarea-bordered textarea h-[400px] ${!isValidJson ? "textarea-error" : ""}`}
-                        defaultValue={JSON.stringify(chartConfig, null, 4)}
-                        onChange={onChange}
-                    ></textarea>
-                    <label className="label">
-                        <span className="label-text"></span>
-                        <span className="label-text-alt">JSON</span>
-                    </label>
-
-                </div>
+                <input type="hidden" name="configJson" value={JSON.stringify(formValues)} readOnly />
                 <div className="flex justify-end my-6">
-                    <button type="submit" className="btn-primary btn" disabled={!isValidJson}>
+                    <button type="submit" className="btn-primary btn">
                         Save
                     </button>
                 </div>
@@ -388,19 +302,23 @@ export function ChartEditorJsonForm({ config, queryId, chartId, resetErrorBounda
 
 export interface ChartEditorProps {
     data?: any;
-    config?: ECOption;
+    config?: ChartFormValues | ECOption;
     queryId: string;
     chartId?: string;
     className?: string;
     datasetType?: string;
 }
 
-export function ChartEditor({ data, config, queryId, chartId, className, datasetType }: ChartEditorProps) {
-    const [chartConfig, setChartConfig] = useState<ECOption>(
-        isEmpty(config) ? {} : config!
+export function ChartEditor({ data, config, className, datasetType }: ChartEditorProps) {
+    const fields = createFields(data);
+    const initialChartConfig: ChartFormValues = createDefaultChartFormValues(fields);
+
+    const c = normalizeChartConfig(config);
+
+    const [chartConfig, setChartConfig] = useState<ChartFormValues>(
+        c ?? initialChartConfig
     );
 
-    const [tab, setTab] = useState("series");
     let _resetErrorBoundary: () => void;
 
     function Fallback({ error, resetErrorBoundary }: FallbackProps) {
@@ -413,36 +331,22 @@ export function ChartEditor({ data, config, queryId, chartId, className, dataset
         );
     }
 
-
-    function makeTabContent() {
-        switch (tab) {
-            case "series":
-                return <ChartEditorForm data={data} onChange={setChartConfig} />;
-            case "advanced":
-                return <ChartEditorJsonForm config={chartConfig} chartId={chartId} queryId={queryId}
-                                            resetErrorBoundary={_resetErrorBoundary} />;
+    function handleFormChange(chartConfig: ChartFormValues) {
+        setChartConfig(chartConfig);
+        if (_resetErrorBoundary) {
+            _resetErrorBoundary();
         }
     }
 
-    const tabContent = makeTabContent();
-
     return (
         <div className={className}>
-            <figure className="h-[35vh]">
+            <figure className="h-[45vh]">
                 <ErrorBoundary
                     FallbackComponent={Fallback}>
                     <Chart data={data} config={chartConfig} datasetType={datasetType}></Chart>
                 </ErrorBoundary>
             </figure>
-            <div className="tabs">
-                <button className={classNames("tab tab-lifted", tab === "series" ? "tab-active" : "")}
-                        onClick={() => setTab("series")}>Editor
-                </button>
-                <button className={classNames("tab tab-lifted", tab === "advanced" ? "tab-active" : "")}
-                        onClick={() => setTab("advanced")}>JSON
-                </button>
-            </div>
-            {tabContent}
+            <ChartEditorForm fields={fields} chartConfig={chartConfig} onChange={handleFormChange} />
         </div>
     );
 }
