@@ -1,5 +1,5 @@
+import type { SVGProps } from "react";
 import * as React from "react";
-import { SVGProps } from "react";
 
 const SvgCustom = (props: SVGProps<SVGSVGElement>) => (
     <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 159 142" {...props}>
