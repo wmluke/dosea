@@ -1,4 +1,4 @@
-import type { ChartData } from "~/components/chart";
+import type { ChartData } from "~/components/chart/chart";
 import { DatasetSchema } from "~/components/dataset-schema";
 import { QueryResultsInspector } from "~/components/query-results-inspector";
 import type { Schema } from "~/lib/connector/connection.server";

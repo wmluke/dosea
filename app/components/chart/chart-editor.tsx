@@ -1,8 +1,4 @@
 import { InformationCircleIcon } from "@heroicons/react/24/solid";
-import type { OptionAxisType } from "echarts/types/src/coord/axisCommonTypes";
-import type { DataStoreDimensionType } from "echarts/types/src/data/DataStore";
-import type { DimensionDefinition } from "echarts/types/src/util/types";
-import type { RangeVector } from "prometheus-query/dist/types";
 import type { ChangeEvent, ReactNode } from "react";
 import { useEffect, useState } from "react";
 import type { FallbackProps } from "react-error-boundary";
@@ -10,82 +6,15 @@ import { ErrorBoundary } from "react-error-boundary";
 import type { UseFormRegister } from "react-hook-form";
 import { FormProvider, useForm, useFormContext } from "react-hook-form";
 import type { FieldPath } from "react-hook-form/dist/types/path";
-import type { ChartData, ECOption } from "~/components/chart";
-import { Chart, isPGResult, isPromResult, isSqliteResult } from "~/components/chart";
+import type { ChartData, ECOption } from "~/components/chart/chart";
+import { Chart } from "~/components/chart/chart";
+import type { ChartType, Field } from "~/components/chart/chart-utils";
+import { createEChartConfig, createFields } from "~/components/chart/chart-utils";
 import SvgBar from "~/components/icons/bar";
 import SvgLine from "~/components/icons/line";
 import SvgScatter from "~/components/icons/scatter";
-import { classNames, isEmpty, isISODateStringLike, useLocalStorage } from "~/utils";
+import { classNames, isEmpty, useLocalStorage } from "~/utils";
 
-
-export interface ChartEditorProps {
-    data?: any;
-    config?: ECOption;
-    queryId: string;
-    chartId?: string;
-    className?: string;
-    datasetType?: string;
-}
-
-interface Field extends DimensionDefinition {
-    id: string;
-    labels?: { [l: string]: string };
-    datasetIndex: number;
-}
-
-
-function inspectFirstRow(row: Object = {}): Field[] {
-    const datasetIndex = 0;
-    return Object.entries(row).map(([name, value], idx) => {
-        const id = idx + "";
-        if (isISODateStringLike(value)) {
-            return { id, name, datasetIndex, type: "time" };
-        }
-        if (typeof value === "string") {
-            return { id, name, datasetIndex, type: "ordinal" };
-        }
-        if (typeof value === "number") {
-            return { id, name, datasetIndex, type: "number" };
-        }
-        return { id, name, datasetIndex };
-    }) ?? [];
-}
-
-
-function createFields(data?: ChartData): Field[] {
-    if (isSqliteResult(data)) {
-        return inspectFirstRow(data[0]);
-    }
-    if (isPGResult(data)) {
-        return inspectFirstRow(data.rows[0]);
-    }
-    if (isPromResult(data)) {
-        const fields: Field[] = data.result.map((r: RangeVector, index) => {
-            const { name = "aggregation", labels } = r.metric;
-            const { instance } = labels as Field["labels"] ?? {};
-            const { type } = inspectFirstRow(r.values[0])[1];
-            return {
-                id: (index + 1) + "",
-                name: instance,
-                type,
-                labels: {
-                    metric: name,
-                    ...labels
-                },
-                datasetIndex: index
-            };
-        });
-        fields.unshift({
-            id: "0",
-            name: "time",
-            type: "time",
-            datasetIndex: -1
-        });
-        return fields;
-    }
-    console.warn("Failed to determine chart data result type");
-    return [];
-}
 
 const chartTypes: { type: ChartType, icon: ReactNode }[] = [
     {
@@ -110,18 +39,16 @@ const chartTypes: { type: ChartType, icon: ReactNode }[] = [
     // }
 ];
 
-export interface ChartEditorFormProps {
-    data: ChartData;
-    onChange: (c: ECOption) => void;
-}
 
-interface ChartFormValues {
+export const CHARTFORMVALUES_SCHEMA_VERSION = 1;
+
+export interface ChartFormValues {
+    version: number,
     chartType: ChartType;
-    // fields: Field[];
     title: {
         enabled: boolean,
         title: string,
-        subtitle: string,
+        subtitle?: string,
     },
     xAxis: {
         label: string;
@@ -137,75 +64,6 @@ interface ChartFormValues {
     tooltip: {
         enabled: boolean,
     };
-}
-
-export type ChartType = "bar" | "line" | "pie" | "scatter" | "radar";
-
-function toAxisType(type?: DataStoreDimensionType): OptionAxisType {
-    switch (type) {
-        case "time":
-            return "time";
-        case "ordinal":
-            return "category";
-        default:
-            return "value";
-    }
-}
-
-export function createEChartConfig(chartFormValues: ChartFormValues, fields: Field[]): ECOption {
-    const xAxisField = fields[Number(chartFormValues.xAxis.fieldId)] ?? {};
-    const series: ECOption["series"] = chartFormValues.yAxis.fieldIds.map((id) => {
-        const field = fields[Number(id)];
-        return {
-            type: chartFormValues.chartType,
-            datasetIndex: field.datasetIndex,
-            name: field.name,
-            // dimensions: [{
-            //     name: field.name,
-            //     type: field.type,
-            //     displayName: field.name
-            // }],
-            encode: {
-                x: xAxisField.name,
-                y: field.name
-            }
-        };
-    });
-
-    const xAxis: ECOption["xAxis"] = {
-        type: toAxisType(xAxisField.type),
-        name: chartFormValues.xAxis.label,
-        nameLocation: "middle",
-        nameGap: 30
-    };
-
-    const yAxis: ECOption["yAxis"] = {
-        type: "value",
-        name: chartFormValues.yAxis.label,
-        nameLocation: "middle",
-        nameGap: 40
-    };
-
-    const title: ECOption["title"] = {
-        show: chartFormValues.title.enabled,
-        text: chartFormValues.title.title,
-        subtext: chartFormValues.title.subtitle
-    };
-
-    const legend: ECOption["legend"] = {
-        show: chartFormValues.legend.enabled,
-        orient: "vertical"
-    };
-
-    const tooltip: ECOption["tooltip"] = {
-        show: chartFormValues.tooltip.enabled,
-        trigger: "axis",
-        axisPointer: {
-            type: "cross"
-        }
-    };
-
-    return { title, legend, tooltip, xAxis, yAxis, series };
 }
 
 type FormSectionProps = {
@@ -381,12 +239,18 @@ function Checkbox({ name, label, register }: CheckboxProps) {
     );
 }
 
+export interface ChartEditorFormProps {
+    data: ChartData;
+    onChange: (c: ECOption) => void;
+}
+
 
 export function ChartEditorForm({ data, onChange }: ChartEditorFormProps) {
     const fields = createFields(data);
     const xAxisField = fields.find(f => f.type === "time") ?? fields[0] ?? {};
 
     const initialChartConfig: ChartFormValues = {
+        version: CHARTFORMVALUES_SCHEMA_VERSION,
         chartType: "line",
         title: {
             enabled: true,
@@ -522,6 +386,14 @@ export function ChartEditorJsonForm({ config, queryId, chartId, resetErrorBounda
     );
 }
 
+export interface ChartEditorProps {
+    data?: any;
+    config?: ECOption;
+    queryId: string;
+    chartId?: string;
+    className?: string;
+    datasetType?: string;
+}
 
 export function ChartEditor({ data, config, queryId, chartId, className, datasetType }: ChartEditorProps) {
     const [chartConfig, setChartConfig] = useState<ECOption>(

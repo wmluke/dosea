@@ -1,5 +1,5 @@
 import LRUCache from "lru-cache";
-import type { ChartData } from "~/components/chart";
+import type { ChartData } from "~/components/chart/chart";
 import { connect } from "~/lib/connector/connection.server";
 import type { QueryWithDatasetAndCharts } from "~/models/query.server";
 import { getQueryById } from "~/models/query.server";

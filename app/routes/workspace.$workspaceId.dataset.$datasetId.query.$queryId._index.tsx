@@ -1,6 +1,6 @@
 import { ChartPieIcon } from "@heroicons/react/24/solid";
 import { Link } from "@remix-run/react";
-import { ChartsGrid } from "~/components/charts-grid";
+import { ChartsGrid } from "~/components/chart/charts-grid";
 import { SectionDropdown } from "~/components/section-dropdown";
 import { useWorkspaceContext } from "~/routes/workspace";
 import { useQueryLayoutLoaderData } from "~/routes/workspace.$workspaceId.dataset.$datasetId.query.$queryId";

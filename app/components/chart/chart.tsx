@@ -15,13 +15,10 @@ import type {
     TitleComponentOption,
     TooltipComponentOption
 } from "echarts/components";
-import type { DatasetOption } from "echarts/types/dist/shared";
-import type { QueryResult as PGQueryResult } from "pg";
-import type { QueryResult as PromQueryResult, RangeVector, SampleValue } from "prometheus-query/dist/types";
 import { useEffect } from "react";
 import { clearTimeout } from "timers";
+import { transformData } from "~/components/chart/chart-utils";
 import type { QueryResult } from "~/lib/connector/connection.server";
-import type { SqliteQueryResult } from "~/lib/connector/sqlite.server";
 
 export type ECOption = echarts.ComposeOption<
     | BarSeriesOption
@@ -46,48 +43,6 @@ export interface ChartProps<T = ChartData> {
     width?: number;
 
     datasetType?: string;
-}
-
-export function isSqliteResult(data?: ChartData): data is SqliteQueryResult {
-    return Array.isArray(data);
-}
-
-export function isPGResult(data?: ChartData): data is PGQueryResult {
-    return Array.isArray((data as PGQueryResult)?.rows);
-}
-
-export function isPromResult(data?: ChartData): data is PromQueryResult {
-    return Array.isArray((data as PromQueryResult)?.result);
-}
-
-
-export function transformData(data?: ChartData): DatasetOption | DatasetOption[] {
-    if (isSqliteResult(data)) {
-        return {
-            source: data
-        };
-    }
-    if (isPGResult(data)) {
-        return { source: data.rows };
-    }
-    if (isPromResult(data)) {
-        return data.result.map((r: RangeVector) => {
-            const { name: metric = "aggregation", labels } = r.metric;
-            const { instance } = labels as { instance: string };
-            return {
-                source: r.values.map((v: SampleValue) => {
-                    return {
-                        instance,
-                        metric,
-                        time: v.time,
-                        [instance]: v.value
-                    };
-                })
-            };
-        });
-    }
-    console.warn("Failed to determine chart data result type");
-    return [];
 }
 
 
