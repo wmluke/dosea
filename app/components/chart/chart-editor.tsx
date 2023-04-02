@@ -216,7 +216,10 @@ function UnitSelect() {
     const { register } = useFormContext<ChartFormValues>();
     return (
         <select className="select select-bordered" {...register("yAxis.units")}>
-            <option value="">Count</option>
+            <option></option>
+            <option value="count">Count</option>
+            <option value="percent_fraction">Percent (fraction)</option>
+            <option value="percent">Percent</option>
             {UNIT_OPTIONS.map((g) => {
                 return (
                     <optgroup key={g.label} label={g.label}>

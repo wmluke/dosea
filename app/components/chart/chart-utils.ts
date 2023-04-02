@@ -136,6 +136,34 @@ function toAxisType(type?: DataStoreDimensionType): OptionAxisType {
     }
 }
 
+function simpleValueFormatter(value: number, fractionDigits: number) {
+    return value < 10_000 ? value.toFixed(fractionDigits) : value.toExponential(1);
+}
+
+function valueFormatter(value: number, units?: string | Unit, fractionDigits: number = 1): string {
+    if (!units || !units.trim()) {
+        return simpleValueFormatter(value, fractionDigits);
+    }
+    switch (units) {
+        case "count":
+            return simpleValueFormatter(value, fractionDigits);
+        case "percent_fraction":
+            return (value * 100).toFixed(fractionDigits) + "%";
+        case "percent":
+            return value.toFixed(fractionDigits) + "%";
+        default:
+            try {
+                const {
+                    val,
+                    unit
+                } = convert(value).from(units as Unit).toBest();
+                return `${val.toFixed(fractionDigits)} ${unit}`;
+            } catch (e) {
+                return simpleValueFormatter(value, fractionDigits);
+            }
+    }
+}
+
 export function createEChartConfig(chartFormValues: ChartFormValues, fields: Field[]): ECOption {
     const xAxisField = fields[Number(chartFormValues.xAxis.fieldId)] ?? {};
     const series: ECOption["series"] = chartFormValues.yAxis.fieldIds.map((id) => {
@@ -156,16 +184,6 @@ export function createEChartConfig(chartFormValues: ChartFormValues, fields: Fie
         };
     });
 
-    function valueFormatter(value: number, fractionDigits: number = 1): string {
-        if (chartFormValues.yAxis.units) {
-            const {
-                val,
-                unit
-            } = convert(value).from(chartFormValues.yAxis.units as Unit).toBest();
-            return `${val.toFixed(fractionDigits)} ${unit}`;
-        }
-        return value < 10_000 ? value.toFixed(fractionDigits) : value.toExponential(1);
-    }
 
     const xAxis: ECOption["xAxis"] = {
         type: toAxisType(xAxisField.type),
@@ -174,13 +192,14 @@ export function createEChartConfig(chartFormValues: ChartFormValues, fields: Fie
         nameGap: 30
     };
 
+    const units = chartFormValues.yAxis.units;
     const yAxis: ECOption["yAxis"] = {
         type: "value",
         name: chartFormValues.yAxis.label,
         nameLocation: "middle",
         nameGap: 60,
         axisLabel: {
-            formatter: (value: number) => valueFormatter(value, 2)
+            formatter: (value: number) => valueFormatter(value, units, 2)
         }
     };
 
@@ -203,7 +222,7 @@ export function createEChartConfig(chartFormValues: ChartFormValues, fields: Fie
             type: "cross"
         },
         valueFormatter: (value): string => {
-            return typeof value === "number" ? valueFormatter(value, 2) : value.toString();
+            return typeof value === "number" ? valueFormatter(value, units, 2) : value.toString();
         }
     };
 
