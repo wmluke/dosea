@@ -1,3 +1,4 @@
+import convert from "convert-units";
 import type { ReactNode } from "react";
 import { useEffect, useState } from "react";
 import type { FallbackProps } from "react-error-boundary";
@@ -54,6 +55,7 @@ export interface ChartFormValues {
     };
     yAxis: {
         label: string;
+        units?: string;
         fieldIds: Array<string>;
     };
     legend: {
@@ -73,7 +75,7 @@ type FormSectionProps = {
 function FormSection({ children, heading, className }: FormSectionProps) {
     return (
         <section className={`py-2 ${className}`}>
-            <h3>{heading}</h3>
+            <h2 className="text-xl">{heading}</h2>
             <fieldset>
                 {children}
             </fieldset>
@@ -195,8 +197,45 @@ function TitleFormSection() {
     );
 }
 
+const UNIT_OPTIONS: {
+    label: string,
+    options: { value: string, label: string }[]
+}[] = convert().measures().sort().map((measure) => {
+    return {
+        label: measure,
+        options: convert().list(measure).map(({ measure, plural, abbr, system, singular }) => {
+            return {
+                value: abbr,
+                label: `${plural} (${abbr})`
+            };
+        })
+    };
+});
+
+function UnitSelect() {
+    const { register } = useFormContext<ChartFormValues>();
+    return (
+        <select className="select select-bordered" {...register("yAxis.units")}>
+            <option value="">Count</option>
+            {UNIT_OPTIONS.map((g) => {
+                return (
+                    <optgroup key={g.label} label={g.label}>
+                        {g.options.map((o) => {
+                            return (
+                                <option key={o.value} value={o.value}>{o.label}</option>
+                            );
+                        })}
+                    </optgroup>
+                );
+            })}
+        </select>
+    );
+}
+
 function AxisFormSection() {
     const { register } = useFormContext();
+
+
     return (
         <FormSection heading="Axis">
             <div className="form-control">
@@ -214,6 +253,12 @@ function AxisFormSection() {
                 <input type="text"
                        className="input-bordered input"
                        {...register("yAxis.label")} />
+            </div>
+            <div className="form-control">
+                <label className="label">
+                    <span className="label-text">Y-Axis Units</span>
+                </label>
+                <UnitSelect />
             </div>
         </FormSection>
     );

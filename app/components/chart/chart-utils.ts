@@ -1,3 +1,5 @@
+import type { Unit } from "convert-units";
+import convert from "convert-units";
 import type { DatasetOption } from "echarts/types/dist/shared";
 import type { OptionAxisType } from "echarts/types/src/coord/axisCommonTypes";
 import type { DataStoreDimensionType } from "echarts/types/src/data/DataStore";
@@ -154,6 +156,17 @@ export function createEChartConfig(chartFormValues: ChartFormValues, fields: Fie
         };
     });
 
+    function valueFormatter(value: number, fractionDigits: number = 1): string {
+        if (chartFormValues.yAxis.units) {
+            const {
+                val,
+                unit
+            } = convert(value).from(chartFormValues.yAxis.units as Unit).toBest();
+            return `${val.toFixed(fractionDigits)} ${unit}`;
+        }
+        return value < 10_000 ? value.toFixed(fractionDigits) : value.toExponential(1);
+    }
+
     const xAxis: ECOption["xAxis"] = {
         type: toAxisType(xAxisField.type),
         name: chartFormValues.xAxis.label,
@@ -165,7 +178,10 @@ export function createEChartConfig(chartFormValues: ChartFormValues, fields: Fie
         type: "value",
         name: chartFormValues.yAxis.label,
         nameLocation: "middle",
-        nameGap: 40
+        nameGap: 60,
+        axisLabel: {
+            formatter: (value: number) => valueFormatter(value, 2)
+        }
     };
 
     const title: ECOption["title"] = {
@@ -177,6 +193,7 @@ export function createEChartConfig(chartFormValues: ChartFormValues, fields: Fie
     const legend: ECOption["legend"] = {
         show: chartFormValues.legend.enabled,
         bottom: 0
+
     };
 
     const tooltip: ECOption["tooltip"] = {
@@ -184,6 +201,9 @@ export function createEChartConfig(chartFormValues: ChartFormValues, fields: Fie
         trigger: "axis",
         axisPointer: {
             type: "cross"
+        },
+        valueFormatter: (value): string => {
+            return typeof value === "number" ? valueFormatter(value, 2) : value.toString();
         }
     };
 
@@ -233,7 +253,8 @@ export function createChartFormValues(echartOptions: ECOption): ChartFormValues 
 
     const yAxis: ChartFormValues["yAxis"] = {
         label: ecYAxis?.name ?? "y-axis",
-        fieldIds: Array.from({ length: ecSeries.length }, (_, i) => (i + 1) + "")
+        fieldIds: Array.from({ length: ecSeries.length }, (_, i) => (i + 1) + ""),
+        units: "number"
     };
 
     const version = CHARTFORMVALUES_SCHEMA_VERSION;
