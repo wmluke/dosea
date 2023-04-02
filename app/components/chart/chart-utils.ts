@@ -193,13 +193,14 @@ export function createEChartConfig(chartFormValues: ChartFormValues, fields: Fie
     };
 
     const units = chartFormValues.yAxis.units;
+    const fractionDigits = chartFormValues.yAxis.fractionDigits ?? 1;
     const yAxis: ECOption["yAxis"] = {
         type: "value",
         name: chartFormValues.yAxis.label,
         nameLocation: "middle",
         nameGap: 60,
         axisLabel: {
-            formatter: (value: number) => valueFormatter(value, units, 2)
+            formatter: (value: number) => valueFormatter(value, units, fractionDigits)
         }
     };
 
@@ -222,7 +223,8 @@ export function createEChartConfig(chartFormValues: ChartFormValues, fields: Fie
             type: "cross"
         },
         valueFormatter: (value): string => {
-            return typeof value === "number" ? valueFormatter(value, units, 2) : value.toString();
+            const fd = chartFormValues.tooltip.fractionDigits ?? 2;
+            return typeof value === "number" ? valueFormatter(value, units, fd) : value.toString();
         }
     };
 
@@ -262,7 +264,8 @@ export function createChartFormValues(echartOptions: ECOption): ChartFormValues 
     };
 
     const tooltip: ChartFormValues["tooltip"] = {
-        enabled: ecTooltip?.show ?? true
+        enabled: ecTooltip?.show ?? true,
+        fractionDigits: 2
     };
 
     const xAxis: ChartFormValues["xAxis"] = {
@@ -273,7 +276,8 @@ export function createChartFormValues(echartOptions: ECOption): ChartFormValues 
     const yAxis: ChartFormValues["yAxis"] = {
         label: ecYAxis?.name ?? "y-axis",
         fieldIds: Array.from({ length: ecSeries.length }, (_, i) => (i + 1) + ""),
-        units: "number"
+        units: "number",
+        fractionDigits: 1
     };
 
     const version = CHARTFORMVALUES_SCHEMA_VERSION;
@@ -298,10 +302,12 @@ export function createDefaultChartFormValues(fields: Field[]): ChartFormValues {
         },
         yAxis: {
             label: "y-axis",
-            fieldIds: fields.map(f => f.id).filter(id => id !== xAxisField.id)
+            fieldIds: fields.map(f => f.id).filter(id => id !== xAxisField.id),
+            fractionDigits: 1
         },
         tooltip: {
-            enabled: true
+            enabled: true,
+            fractionDigits: 2
         },
         legend: {
             enabled: true

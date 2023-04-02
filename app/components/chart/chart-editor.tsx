@@ -56,13 +56,15 @@ export interface ChartFormValues {
     yAxis: {
         label: string;
         units?: string;
+        fractionDigits?: number;
         fieldIds: Array<string>;
     };
     legend: {
-        enabled: boolean,
+        enabled: boolean;
     };
     tooltip: {
-        enabled: boolean,
+        enabled: boolean;
+        fractionDigits?: number;
     };
 }
 
@@ -263,6 +265,14 @@ function AxisFormSection() {
                 </label>
                 <UnitSelect />
             </div>
+            <div className="form-control">
+                <label className="label">
+                    <span className="label-text">Y-Axis Fraction Digits</span>
+                </label>
+                <input type="number"
+                       className="input-bordered input"
+                       {...register("yAxis.fractionDigits", { valueAsNumber: true })} />
+            </div>
         </FormSection>
     );
 }
@@ -332,6 +342,14 @@ export function ChartEditorForm({ fields, chartConfig, onChange }: ChartEditorFo
                     </FormSection>
                     <FormSection heading="Tooltip">
                         <Checkbox label="Enabled" name="tooltip.enabled" register={register} />
+                        <div className="form-control">
+                            <label className="label">
+                                <span className="label-text">Tooltip Fraction Digits</span>
+                            </label>
+                            <input type="number"
+                                   className="input-bordered input"
+                                   {...register("tooltip.fractionDigits", { valueAsNumber: true })} />
+                        </div>
                     </FormSection>
                 </form>
             </FormProvider>
