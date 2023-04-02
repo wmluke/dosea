@@ -75,7 +75,7 @@ export function Chart({ data, config, fields, width }: ChartProps) {
         }
         const legendComponent = (echartsInstance as any)._componentsViews
             .find((entry: any) => entry.type === "legend.plain");
-        const legendHeight = legendComponent._backgroundEl.shape.height;
+        const legendHeight = legendComponent?._backgroundEl?.shape?.height;
         if (legendHeight) {
             echartsInstance.setOption({
                 grid: {

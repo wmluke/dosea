@@ -7,14 +7,18 @@ import { classNames, truncate } from "~/utils";
 
 export interface DatasetQueryNavProps {
     dataset?: ConvertDatesToStrings<DatasetWithQueries>;
+    showHeading?: boolean;
 }
 
-export function DatasetQueryNav({ dataset }: DatasetQueryNavProps) {
+export function DatasetQueryNav({ dataset, showHeading = true }: DatasetQueryNavProps) {
+    const heading = (
+        <li className="menu-title">
+            <span className="text-xl">Queries</span>
+        </li>
+    );
     return (
         <>
-            <li className="menu-title">
-                <span className="text-xl">Queries</span>
-            </li>
+            {showHeading && heading}
             {dataset?.queries.map((q) => {
                 return (
                     <li key={q.id}>
