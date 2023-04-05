@@ -3,7 +3,7 @@ module.exports = {
     content: [
         "node_modules/daisyui/dist/**/*.js",
         "node_modules/react-daisyui/dist/**/*.js",
-        "./app/**/*.{ts,tsx,jsx,js}",
+        "./app/**/*.{ts,tsx,jsx,js}"
     ],
     theme: {
         extend: {},
@@ -29,17 +29,18 @@ module.exports = {
             13: "13",
             14: "14",
             15: "15",
-            16: "16",
-        },
+            16: "16"
+        }
     },
     plugins: [
         require("@tailwindcss/typography"),
         require("@tailwindcss/forms"),
         require("@tailwindcss/aspect-ratio"),
-        require("daisyui"),
+        require("daisyui")
     ],
 
     daisyui: {
-        themes: ["night", "night", "aqua"],
-    },
+        darkTheme: "night",
+        themes: ["light", "night"]
+    }
 };

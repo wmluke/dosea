@@ -53,9 +53,9 @@ export default function DatasetPage() {
     return (
         <div className="mx-2 my-2 px-2 bg-base-100 bg-opacity-90">
             <div className="m-0 p-0 flex flex-col justify-start gap-6 divide-y divide-neutral-800">
-                <section id="dataset-details" className="mx-0 px-0 mt-2">
-                    <div className="flex justify-between mt-6">
-                        <h1 className="prose text-2xl flex gap-2 my-2">
+                <section id="dataset-details" className="mx-0 px-0 mt-0">
+                    <div className="flex justify-between mt-0">
+                        <h1 className="prose text-2xl flex gap-2 my-2 mt-0">
                             <CircleStackIcon className="h-[32px] w-[32px]"></CircleStackIcon>
                             {dataset?.name}
                         </h1>
