@@ -36,7 +36,7 @@ describe("SqliteDatabase", () => {
             const dataDir = "/data";
 
             expect(new SqliteConnection({ filePath: "./file.db" })
-                .normalizeAndValidate()).toBe(process.cwd() + "/data/file.db");
+                .normalizeAndValidate()).toBe(process.cwd() + "/data/datasets/file.db");
 
             expect(new SqliteConnection({ filePath: "./file.db", dataDir })
                 .normalizeAndValidate()).toBe("/data/file.db");

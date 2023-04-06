@@ -49,7 +49,7 @@ function makeQueryCache() {
         maxSize: 5000,
         sizeCalculation: (entry) => {
             if (Array.isArray(entry.result)) {
-                return entry.result.length;
+                return Math.max(1, entry.result.length);
             }
             return 1;
         },

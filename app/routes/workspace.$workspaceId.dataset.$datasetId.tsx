@@ -59,7 +59,7 @@ export default function DatasetPage() {
                             <CircleStackIcon className="h-[32px] w-[32px]"></CircleStackIcon>
                             {dataset?.name}
                         </h1>
-                        <SectionDropdown>
+                        <SectionDropdown id="dataset-section-dropdown">
                             <Link className="text-sm"
                                   to={["/workspace", dataset?.workspaceId, "dataset", dataset?.id, "edit"].join("/")}
                                   reloadDocument>

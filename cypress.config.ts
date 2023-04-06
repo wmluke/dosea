@@ -4,11 +4,11 @@ export default defineConfig({
     e2e: {
         setupNodeEvents: (on, config) => {
             const isDev = config.watchForFileChanges;
-            const port = process.env.PORT ?? (isDev ? "3000" : "8811");
+            const port = process.env.PORT ?? (isDev ? "3001" : "8811");
             const configOverrides: Partial<Cypress.PluginConfigOptions> = {
                 baseUrl: `http://localhost:${port}`,
                 video: !process.env.CI,
-                screenshotOnRunFailure: !process.env.CI,
+                screenshotOnRunFailure: !process.env.CI
             };
 
             // To use this:

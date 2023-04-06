@@ -58,7 +58,7 @@ if (process.env.NODE_ENV === "production") {
 
 function createConnection(url: string, type: string): Connection<Schema, any, QueryResult> {
     const readonly = true;
-    const dataDir = process.env.DOSEA_DATA_DIR ?? path.resolve(process.cwd(), "data");
+    const dataDir = process.env.DOSEA_DATASETS_DIR ?? path.resolve(process.cwd(), "data", "datasets");
     const allowedPaths = [process.env.DOSEA_ALLOWED_PATHS ?? `${dataDir}/**/*`];
     switch (type) {
         case "sqlite":

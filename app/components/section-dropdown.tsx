@@ -3,11 +3,12 @@ import type { PropsWithChildren } from "react";
 import { Children } from "react";
 
 export interface SectionDropdownProps {
+    id?: string;
 }
 
-export function SectionDropdown({ children }: PropsWithChildren<SectionDropdownProps>) {
+export function SectionDropdown({ children, id }: PropsWithChildren<SectionDropdownProps>) {
     return (
-        <div className="dropdown dropdown-hover dropdown-left z-50">
+        <div id={id} className="dropdown dropdown-left z-50">
             <label tabIndex={0} className="btn btn-xs btn-square btn-info">
                 <EllipsisHorizontalIcon className="w-6 h-6" />
             </label>

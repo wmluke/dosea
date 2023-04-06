@@ -17,6 +17,7 @@ Take a gander at the [demo](https://dosea-7b28.fly.dev/).
 * Sqlite [Sqlean extensions](https://github.com/nalgeon/sqlean) for math and stats aggregation
 * Charts powered by [Echarts](https://echarts.apache.org)
 * Fully responsive UI for mobile, tablet, and desktop
+* Supports Light, Dark, and System UI themes
 
 ## Run it at home
 

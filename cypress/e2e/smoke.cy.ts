@@ -16,13 +16,16 @@ describe("smoke tests", () => {
 
         cy.get("#input-for-dataset-name").type("a dataset 123");
         cy.get("#select-for-dataset-type").select("Sqlite");
-        cy.get("#input-for-dataset-connection").type("./fixtures/foobar.db");
+        cy.get("#input-for-dataset-connection").type("./datasets/foobar.db");
 
         cy.findByRole("button", { name: /add dataset/i }).click();
 
         cy.wait(200);
 
         cy.findByRole("link", { name: /a dataset 123/i }).click();
+
+        cy.get("#dataset-section-dropdown ul li:last a").click({ force: true });
+
 
     });
 });

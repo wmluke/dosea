@@ -77,7 +77,7 @@ export class SqliteConnection implements Connection<Table[], never, SqliteQueryR
         }
 
         const normalizeFilePath = path.resolve(
-            path.normalize(dataDir ?? path.resolve(process.cwd(), "data")),
+            path.normalize(dataDir ?? path.resolve(process.cwd(), "data", "datasets")),
             path.normalize(filePath)
         );
         if (isEmpty(allowedPaths)) {
