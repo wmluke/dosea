@@ -47,7 +47,7 @@
     "@tailwindcss/typography": "^0.5.9",
     "@types/pg": "^8.6.6",
     "bcryptjs": "^2.4.3",
-    "better-sqlite3": "^8.2.0",
+    "better-sqlite3": "^11.10.0",
     "convert-units": "^2.3.4",
     "daisyui": "^2.51.3",
     "echarts": "^5.4.1",
